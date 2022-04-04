@@ -32,6 +32,8 @@
             </div>
         </div>
     </div>
+
+    @can('do-admin-stuff')
     <div class="row">
         <div class="col-6">
             <div class="card card-danger">
@@ -46,6 +48,7 @@
             </div>
         </div>
     </div>
+    @endcan
 </div>
 </div>
 @endsection
@@ -88,8 +91,10 @@
 
 <script>
     const myChart = new Chart(
-    document.getElementById('myChart'),
-    config
-  );
+        document.getElementById('myChart'),
+        config
+    );
+
 </script>
+
 @endsection

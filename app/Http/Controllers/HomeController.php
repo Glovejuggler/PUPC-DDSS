@@ -47,10 +47,6 @@ class HomeController extends Controller
                 $query->where('role_id','=',$role->id);
             })->count();
         }
-
-        if(session('fail')){
-            Alert::toast(session('fail'), 'error');
-        }
         
         // return $count;
         return view('home', compact('userCount','filecount', 'roles', 'count'));

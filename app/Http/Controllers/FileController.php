@@ -24,7 +24,7 @@ class FileController extends Controller
         if(Gate::allows('do-admin-stuff')){
             if(request('show_deleted') == 1){
                 $files = File::onlyTrashed()->get();
-                $folders = Folder::onlyTrashed()->get();
+                $folders = Folder::all();
             } else {
                 $files = File::all();
                 $folders = Folder::all();

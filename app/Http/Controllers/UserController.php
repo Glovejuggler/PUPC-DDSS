@@ -21,7 +21,7 @@ class UserController extends Controller
     {
         if(! Gate::allows('do-admin-stuff')){
             return redirect()->back()
-                            ->with('fail','You are not allowed to access that path!');
+                            ->with('toast_error', 'You are not allowed to access that path!');
         }
 
         $roles = Role::all();

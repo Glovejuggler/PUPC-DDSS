@@ -42,17 +42,22 @@
                                 </div>
 
                                 <label for="folder" class="form-label">Folder</label>
+                                @if($folders->isNotEmpty())
                                 <div class="input-group mb-2">
                                     <span class="input-group-text"><i class="fas fa-folder"></i></span>
                                     <select name="folder_id" class="form-select" aria-label="Default select example"
                                         id="folder" required>
-                                        <option selected hidden disabled>Choose a folder...
-                                        </option>
                                         @foreach ($folders as $folder)
                                         <option value="{{ $folder->id }}">{{ $folder->folderName }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+                                @else
+                                <div class="input-group mb-2">
+                                    <a href="{{ route('folder.index') }}" class="btn btn-sm btn-success">Create a
+                                        folder</a>
+                                </div>
+                                @endif
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -87,7 +92,7 @@
                                     class="btn btn-sm btn-success mr-1">Restore</a>
                                 @endif
                                 @endcan
-                                <a href="#" class="btn btn-sm btn-primary">
+                                <a href="{{ $file->filePath }}" download class="btn btn-sm btn-primary">
                                     <i class="fas fa-download"></i>
                                 </a>
                                 @if(!request('show_deleted') == 1)

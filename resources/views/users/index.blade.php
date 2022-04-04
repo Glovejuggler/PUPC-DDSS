@@ -50,7 +50,7 @@
 
                                 <label for="role" class="form-label">Role</label>
                                 <div class="input-group mb-2">
-                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
                                     <select name="role" class="form-select" aria-label="Default select example"
                                         id="role" required>
                                         <option selected hidden>Select a role...
