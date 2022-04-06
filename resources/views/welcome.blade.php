@@ -419,7 +419,7 @@
         @endif
 
         <div class="row">
-            <h3 class="text-light" id="time"></h3>
+            <h3 class="text-light">lamao</h3>
         </div>
 </body>
 
