@@ -19,11 +19,6 @@ class UserController extends Controller
      */
     public function index()
     {
-        if(! Gate::allows('do-admin-stuff')){
-            return redirect()->back()
-                            ->with('toast_error', 'You are not allowed to access that path!');
-        }
-
         $roles = Role::all();
         $users = User::all();
         return view('users.index', compact('users', 'roles'));
