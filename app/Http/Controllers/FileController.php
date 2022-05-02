@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\File;
 use App\Models\Folder;
+use App\Models\Share;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -145,5 +146,14 @@ class FileController extends Controller
         
 
         return redirect()->back()->with('toast_success', 'File deleted successfully');
+    }
+
+    public function share(File $file)
+    {
+        Share::create([
+            'file_id' => $file->id,
+            'role_id' => $request->role_id,
+            'shared_at' => now(),
+        ]);
     }
 }

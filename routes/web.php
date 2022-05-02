@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FolderController;
+use App\Http\Controllers\ShareController;
 
 
 /*
@@ -52,4 +53,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/file/create', [FileController::class, 'store'])->name('file.store');
     Route::delete('/file/delete/{file}', [FileController::class, 'destroy'])->name('file.destroy');
     Route::get('/file/recover/{id}', [FileController::class, 'recover'])->name('file.recover');
+
+    Route::get('/shared_files', [ShareController::class, 'index'])->name('share.index');
 });
