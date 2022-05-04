@@ -104,11 +104,11 @@
                                     id="btn-delete-file">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                                @endif
                                 <a href="#" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
                                     data-bs-target="#shareFileModal">
                                     <i class="fas fa-share-nodes"></i>
                                 </a>
+                                @endif
 
                                 {{-- Delete Confirm Modal --}}
                                 <div class="modal fade" id="removeFileModal" aria-hidden="true">

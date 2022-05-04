@@ -100,6 +100,11 @@ class FileController extends Controller
         return redirect()->back()->with('toast_success', 'File(s) uploaded successfully');
     }
 
+    public function download(File $file)
+    {
+        
+    }
+
     /**
      * Display the specified resource.
      *
