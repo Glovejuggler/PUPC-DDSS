@@ -13,4 +13,8 @@ class Share extends Model
     public function file(){
         return $this->hasMany(File::class);
     }
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

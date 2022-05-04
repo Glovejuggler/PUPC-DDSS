@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
-use App\Models\Folder;
+use App\Models\Role;
 use App\Models\Share;
+use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -39,7 +40,10 @@ class FileController extends Controller
             })->get();
         }
 
-        return view('files.index', compact('files', 'folders'));
+        $roles = Role::all();
+        $shared = Share::all();
+
+        return view('files.index', compact('files', 'folders', 'roles'));
     }
 
     public function recover($id)

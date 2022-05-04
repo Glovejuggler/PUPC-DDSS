@@ -61,7 +61,10 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="submit" class="btn btn-primary" onclick="displayLoading()" id="upload">
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                                        style="display: none"></span>
+                                    <span id="uploadtxt">Upload</span></button>
                             </div>
                         </form>
                     </div>
@@ -102,6 +105,10 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                                 @endif
+                                <a href="#" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#shareFileModal">
+                                    <i class="fas fa-share-nodes"></i>
+                                </a>
 
                                 {{-- Delete Confirm Modal --}}
                                 <div class="modal fade" id="removeFileModal" aria-hidden="true">
@@ -130,6 +137,45 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                {{-- Share File Modal --}}
+                                <div class="modal fade" id="shareFileModal" data-bs-backdrop="static"
+                                    data-bs-keyboard="false" tabindex="-1" aria-labelledby="shareFileModalLabel"
+                                    aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="shareFileModalLabel">Share file</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="alert alert-info" role="alert">
+                                                    This feature is not yet working
+                                                </div>
+                                                @foreach ($roles as $role)
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        value="{{ $role->id }}" id="defaultCheck1">
+                                                    <label class="form-check-label" for="defaultCheck1">
+                                                        {{ $role->roleName }}
+                                                    </label>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary" onclick="displayLoading()"
+                                                    id="upload">
+                                                    <span class="spinner-border spinner-border-sm" role="status"
+                                                        aria-hidden="true" style="display: none"></span>
+                                                    <span id="uploadtxt">Share</span></button>
+                                            </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -148,5 +194,12 @@
         const url = $(this).data('url');
         $('#removeFileModalForm').attr('action', url);
     });
+
+    function displayLoading(){
+        e.preventDefault();
+        document.getElementById('loading').style.display = "inline-block"
+        document.getElementById('upload').disabled = true;
+        document.getElementById('uploadtxt').innerHTML = 'Uploading';
+    }
 </script>
 @endsection

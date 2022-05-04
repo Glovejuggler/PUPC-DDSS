@@ -17,7 +17,14 @@ class ShareController extends Controller
      */
     public function index()
     {
-        $files = File::all();
+        $shared = Share::where('role_id','=',Auth::user()->role_id)->get();
+
+        $files = [];
+        foreach ($shared as $shared_file) {
+            $files[] = File::where('id','=',$shared_file->file_id)->first();
+        }
+
+        // dd($files);
 
         return view('share.index', compact('files'));
     }

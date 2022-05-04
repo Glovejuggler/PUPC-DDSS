@@ -53,7 +53,7 @@
                                     <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
                                     <select name="role" class="form-select" aria-label="Default select example"
                                         id="role" required>
-                                        <option selected hidden>Select a role...
+                                        <option selected disabled hidden value="">Select a role...
                                         </option>
                                         @foreach ($roles as $role)
                                         <option value="{{ $role->id }}">{{ $role->roleName }}</option>
