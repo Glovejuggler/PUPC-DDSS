@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
+use App\Models\Role;
 use App\Models\Share;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,9 +35,13 @@ class ShareController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function share($id)
     {
-        //
+        $file = File::FindOrFail($id);
+        $roles = Role::all();
+        $shares = Share::where('file_id','=',$id)->get();
+
+        return view('share.share_file', compact('roles', 'shares', 'file'));
     }
 
     /**
@@ -45,9 +50,29 @@ class ShareController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function create(Request $request)
     {
-        //
+        $files = Share::FindOrFail($request->file_id);
+
+        foreach ($request->role_id as $role_id) {
+            foreach ($files as $file) {
+                if ($file->role_id != $role_id) {
+                    Share::create([
+                        'file_id' => $request->file_id,
+                        'role_id' => $role_id,
+                        'shared_at' => now(),
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('user.index')->with('toast_success', 'Successfully shared file');
+
+        // catch (\Illuminate\Database\QueryException $exception) {
+        //     $errorInfo = $exception->errorInfo;
+
+        //     return dd($errorInfo);
+        // }
     }
 
     /**
@@ -93,5 +118,14 @@ class ShareController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function shareThisFile(File $file)
+    {
+        $share = Share::where('file_id','=',$file->id);
+
+        return response()->json([
+            'data' => $share
+        ]);
     }
 }

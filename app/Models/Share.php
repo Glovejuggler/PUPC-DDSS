@@ -17,4 +17,9 @@ class Share extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    protected $fillable = [
+        'file_id',
+        'role_id',
+    ];
 }

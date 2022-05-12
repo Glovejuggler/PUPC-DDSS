@@ -156,13 +156,4 @@ class FileController extends Controller
 
         return redirect()->back()->with('toast_success', 'File deleted successfully');
     }
-
-    public function share(File $file)
-    {
-        Share::create([
-            'file_id' => $file->id,
-            'role_id' => $request->role_id,
-            'shared_at' => now(),
-        ]);
-    }
 }

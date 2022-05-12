@@ -119,6 +119,15 @@
                                         <p>Files</p>
                                     </a>
                                 </li>
+                                @cannot('do-admin-stuff')
+                                <li class="nav-item">
+                                    <a href="{{ route('share.index') }}"
+                                        class="nav-link {{ Request::is('shared_files') ? 'active' : '' }}">
+                                        <i class="fas fa-square-share-nodes nav-icon"></i>
+                                        <p>Shared Files</p>
+                                    </a>
+                                </li>
+                                @endcannot
                             </ul>
                         </li>
                     </ul>

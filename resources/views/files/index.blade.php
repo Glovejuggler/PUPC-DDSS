@@ -104,8 +104,7 @@
                                     id="btn-delete-file">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                                <a href="#" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#shareFileModal">
+                                <a href="{{ route('share.file', $file->id) }}" class="btn btn-secondary btn-sm">
                                     <i class="fas fa-share-nodes"></i>
                                 </a>
                                 @endif
