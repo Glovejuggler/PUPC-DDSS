@@ -17,6 +17,7 @@ class CreateSharesTable extends Migration
             $table->id();
             $table->integer('file_id');
             $table->integer('role_id');
+            $table->integer('shared_by');
             $table->timestamp('shared_at');
             $table->timestamps();
         });

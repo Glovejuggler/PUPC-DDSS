@@ -38,7 +38,7 @@ class ShareController extends Controller
     public function share($id)
     {
         $file = File::FindOrFail($id);
-        $roles = Role::all();
+        $roles = Role::where('id','!=',Auth::user()->role_id)->get();
         $shares = Share::where('file_id','=',$id)->get();
 
         return view('share.share_file', compact('roles', 'shares', 'file'));
@@ -52,27 +52,33 @@ class ShareController extends Controller
      */
     public function create(Request $request)
     {
-        $files = Share::FindOrFail($request->file_id);
+        // foreach ($request->role_id as $role_id) {
+        //     Share::firstOrCreate([
+        //         'file_id' => $request->file_id,
+        //         'role_id' => $role_id,
+        //     ], [
+        //         'shared_by' => Auth::user()->id,
+        //         'shared_at' => now(),
+        //     ]);
+        // }
 
-        foreach ($request->role_id as $role_id) {
-            foreach ($files as $file) {
-                if ($file->role_id != $role_id) {
-                    Share::create([
-                        'file_id' => $request->file_id,
-                        'role_id' => $role_id,
-                        'shared_at' => now(),
-                    ]);
-                }
+        if($request->has('role_id')) {
+            foreach ($request->role_id as $role_id) {
+                Share::firstOrCreate([
+                    'file_id' => $request->file_id,
+                    'role_id' => $role_id,
+                ], [
+                    'shared_by' => Auth::user()->id,
+                    'shared_at' => now(),
+                ]);
             }
+            Share::where('file_id','=',$request->file_id)->whereNotIn('role_id', $request->role_id)->delete();
+        } else {
+            Share::where('file_id','=',$request->file_id)->delete();
         }
 
-        return redirect()->route('user.index')->with('toast_success', 'Successfully shared file');
 
-        // catch (\Illuminate\Database\QueryException $exception) {
-        //     $errorInfo = $exception->errorInfo;
-
-        //     return dd($errorInfo);
-        // }
+        return redirect()->route('file.index')->with('toast_success', 'Successfully shared file');
     }
 
     /**

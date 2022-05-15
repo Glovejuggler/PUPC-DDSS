@@ -8,13 +8,14 @@
         <div class="card-header">
             <h3 class="card-title">Share this file</h3>
         </div>
-        <form action="{{ route('file.sharefile') }}" method="post">
+        <form action="{{ route('share.sharefile') }}" method="post">
             @csrf
+            @method('POST')
             <div class="card-body">
                 <input type="text" class="form-control" name="file_id" value="{{ $file->id }}" hidden>
-                @foreach ($roles as $role)
+                @forelse ($roles as $role)
                 @if ($role->id != Auth::user()->role_id)
-                <div class=" form-check">
+                <div class="form-check">
                     <input class="form-check-input" type="checkbox" value="{{ $role->id }}" name="role_id[]"
                         id="checkbox{{ $role->id }}" @foreach ($shares as $share) {{ $share->role_id ==
                     $role->id ? 'checked' : '' }}
@@ -24,7 +25,9 @@
                     </label>
                 </div>
                 @endif
-                @endforeach
+                @empty
+                <p>No other roles to share this file to.</p>
+                @endforelse
             </div>
             <div class="card-footer">
                 <button class="btn btn-sm btn-primary" type="submit">Share</button>

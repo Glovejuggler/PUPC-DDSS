@@ -43,10 +43,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/file/share', [ShareController::class, 'create'])->name('file.sharefile');
-    Route::get('/file/{id}/share', [ShareController::class, 'share'])->name('share.file');
-    Route::get('/shared_files', [ShareController::class, 'index'])->name('share.index');
-
     Route::get('/folders', [FolderController::class, 'index'])->name('folder.index');
     Route::post('/folder/create', [FolderController::class, 'store'])->name('folder.store');
     Route::delete('/folder/delete/{folder}', [FolderController::class, 'destroy'])->name('folder.destroy');
@@ -57,4 +53,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/file/create', [FileController::class, 'store'])->name('file.store');
     Route::delete('/file/delete/{file}', [FileController::class, 'destroy'])->name('file.destroy');
     Route::get('/file/recover/{id}', [FileController::class, 'recover'])->name('file.recover');
+    
+    Route::get('/file/{id}/share', [ShareController::class, 'share'])->name('share.file');
+    Route::post('/share', [ShareController::class, 'create'])->name('share.sharefile');
+    Route::get('/shared_files', [ShareController::class, 'index'])->name('share.index');
 });
