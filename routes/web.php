@@ -43,6 +43,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+
     Route::get('/folders', [FolderController::class, 'index'])->name('folder.index');
     Route::post('/folder/create', [FolderController::class, 'store'])->name('folder.store');
     Route::delete('/folder/delete/{folder}', [FolderController::class, 'destroy'])->name('folder.destroy');

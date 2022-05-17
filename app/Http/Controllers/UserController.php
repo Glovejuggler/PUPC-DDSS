@@ -7,6 +7,7 @@ use App\Models\File;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
@@ -119,5 +120,13 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->back()->with('toast_success', "User deleted successfully");
+    }
+
+    public function profile()
+    {
+        $user = Auth::user();
+        $files = File::where('user_id','=',$user->id)->get();
+
+        return view('users.profile', compact('user', 'files'));
     }
 }

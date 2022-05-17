@@ -58,7 +58,7 @@
                                 </a>
                                 <button type="submit" class="btn btn-danger btn-sm mx-1" data-bs-toggle="modal"
                                     data-bs-target="#removeRoleModal" data-url="{{route('role.destroy', $role->id)}}"
-                                    id="btn-delete-role">
+                                    id="btn-delete-role" {{ $role->id == 1 ? 'disabled' : '' }}>
                                     <i class="fas fa-trash"></i>
                                 </button>
 
