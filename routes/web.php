@@ -28,6 +28,8 @@ Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+Route::post('/emailcheck', [UserController::class, 'emailcheck'])->name('email.check');
+
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('user.index');
     Route::post('/user/create', [UserController::class, 'store'])->name('user.store');
@@ -44,6 +46,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+    Route::get('/profile/edit', [UserController::class, 'profile_edit'])->name('profile.edit');
+    Route::put('profile/update', [UserController::class, 'profile_update'])->name('profile.update');
+    Route::put('/change_password', [UserController::class, 'change_password'])->name('change_password');
 
     Route::get('/folders', [FolderController::class, 'index'])->name('folder.index');
     Route::post('/folder/create', [FolderController::class, 'store'])->name('folder.store');

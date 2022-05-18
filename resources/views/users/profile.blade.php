@@ -5,7 +5,7 @@
     <div class="card mt-4">
         <div class="card-header d-flex justify-content-between">
             <h3 class="card-title">Your Profile</h3>
-            <a class="card-title ml-auto" href="{{ route('user.edit', $user->id) }}">
+            <a class="card-title ml-auto" href="{{ route('profile.edit') }}">
                 <h3 class="card-title"><i class="fas fa-edit"></i> Edit</h3>
             </a>
         </div>
