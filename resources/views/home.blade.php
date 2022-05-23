@@ -66,7 +66,7 @@
         @endforeach
         ],
         datasets: [{
-            label: 'My First Dataset',
+            label: 'Files',
             data: [
                 @foreach ($count as $roleFileCount)
                     {{ $roleFileCount }},

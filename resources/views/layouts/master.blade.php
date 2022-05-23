@@ -97,7 +97,7 @@
                         </li>
                         @endcan
                         <li
-                            class="nav-item {{ Request::is('files') || Request::is('folders') ? 'menu-open' : 'menu-close' }}">
+                            class="nav-item {{ Request::is('files') || Request::is('folders') || Request::is('shared_files') ? 'menu-open' : 'menu-close' }}">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-folder-tree"></i>
                                 <p>

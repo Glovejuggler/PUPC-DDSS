@@ -175,7 +175,7 @@ class UserController extends Controller
         if(Hash::check($request->old_password, $user->password)) {
             if($request->new_password == $request->confirm_password){
                 $user->update([
-                    $user->password = Hash::make($request->confirmPassword)
+                    $user->password = Hash::make($request->confirm_password)
                 ]);
             } else {
                 return redirect(url()->previous().'#changepassword')->withErrors([
