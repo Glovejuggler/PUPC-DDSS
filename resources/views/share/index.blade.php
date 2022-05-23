@@ -27,7 +27,8 @@
                             }}</td>
                         <td>
                             <div class="d-flex justify-content-center">
-                                <a href="{{ $file->filePath }}" download class="btn btn-sm btn-primary">
+                                <a href="{{ route('file.download', $file->id) }}" download
+                                    class="btn btn-sm btn-primary">
                                     <i class="fas fa-download"></i>
                                 </a>
                             </div>

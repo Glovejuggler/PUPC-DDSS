@@ -21,6 +21,7 @@ class Share extends Model
     protected $fillable = [
         'file_id',
         'role_id',
+        'shared_at',
         'shared_by',
     ];
 }

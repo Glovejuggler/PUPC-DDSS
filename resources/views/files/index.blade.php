@@ -95,7 +95,8 @@
                                     class="btn btn-sm btn-success mr-1">Restore</a>
                                 @endif
                                 @endcan
-                                <a href="{{ $file->filePath }}" download class="btn btn-sm btn-primary">
+                                <a href="{{ route('file.download', $file->id) }}" download
+                                    class="btn btn-sm btn-primary">
                                     <i class="fas fa-download"></i>
                                 </a>
                                 @if(!request('show_deleted') == 1)

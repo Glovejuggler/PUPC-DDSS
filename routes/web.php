@@ -58,6 +58,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/files', [FileController::class, 'index'])->name('file.index');
     Route::post('/file/create', [FileController::class, 'store'])->name('file.store');
+    Route::get('file/download/{id}', [FileController::class, 'download'])->name('file.download');
     Route::delete('/file/delete/{file}', [FileController::class, 'destroy'])->name('file.destroy');
     Route::get('/file/recover/{id}', [FileController::class, 'recover'])->name('file.recover');
     

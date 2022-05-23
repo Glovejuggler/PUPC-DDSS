@@ -33,6 +33,7 @@
         </div>
     </div>
 
+    @if ($filecount != 0)
     @can('do-admin-stuff')
     <div class="row">
         <div class="col-6">
@@ -49,6 +50,7 @@
         </div>
     </div>
     @endcan
+    @endif
 </div>
 </div>
 @endsection

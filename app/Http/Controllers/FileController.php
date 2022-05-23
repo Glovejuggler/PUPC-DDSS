@@ -100,9 +100,12 @@ class FileController extends Controller
         return redirect()->back()->with('toast_success', 'File(s) uploaded successfully');
     }
 
-    public function download(File $file)
+    public function download($id)
     {
+        $file = File::find($id);
+        $path = str_replace('\\', '/', storage_path()).'/app/public/'.$file->filePath;
         
+        return response()->download($path);
     }
 
     /**
