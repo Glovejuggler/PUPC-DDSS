@@ -13,9 +13,10 @@
                     data-bs-target="#addFileModal"><i class="fas fa-file-arrow-up"></i> Upload file</button>
                 @can('do-admin-stuff')
                 <nav class="nav ml-auto">
-                    <a class="nav-link" href="{{ route('file.index') }}"
+                    <a class="nav-link" href="{{ request('grid') == 1 ? Request::url().'?grid=1' : Request::url() }}"
                         style="{{ request('show_deleted') == 1 ? '' : 'font-weight: 700' }}">All</a>
-                    <a class="nav-link" href="{{ route('file.index') }}?show_deleted=1"
+                    <a class="nav-link"
+                        href="{{ request('grid') == 1 ? Request::url().'?grid=1&' : Request::url().'?' }}show_deleted=1"
                         style="{{ request('show_deleted') == 1 ? 'font-weight: 700' : '' }}">Trash</a>
                 </nav>
                 @endcan
@@ -71,12 +72,34 @@
                 </div>
             </div>
             <hr>
-
-            <table class="table table-bordered datatable dt-select" id="myTable">
+            <div class="mt-1">
+                <nav class="nav ml-auto">
+                    <a class="nav-link"
+                        href="{{ request('show_deleted') == 1 ? Request::url().'?show_deleted=1' : Request::url() }}"
+                        style="{{ request('grid') == 1 ? '' : 'font-weight: 700' }}"><i class="fas fa-list"></i> List
+                        view</a>
+                    <a class="nav-link"
+                        href="{{ request('show_deleted') == 1 ? Request::url().'?show_deleted=1&' : Request::url().'?' }}grid=1"
+                        style="{{ request('grid') == 1 ? 'font-weight: 700' : '' }}"><i class="fas fa-th"></i> Grid
+                        view</a>
+                </nav>
+            </div>
+            @if (request('grid') == 1)
+            @forelse ($files as $file)
+            <h3>{{ $file->fileName }}</h3>
+            @empty
+            <h3>No data to display</h3>
+            @endforelse
+            @else
+            <table class="table table-bordered hover compact" id="fileIndexTable">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Uploader</th>
+                        @if(request('show_deleted') == 1)
+                        <th>Date deleted</th>
+                        @endif
+                        <th>Date uploaded</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -87,6 +110,10 @@
                         <td>{{ $file->user == NULL ? 'Deleted user' : $file->user->first_name.'
                             '.$file->user->last_name
                             }}</td>
+                        @if(request('show_deleted') == 1)
+                        <td>{{ $file->deleted_at->format('M j, Y \a\t g:i:s A') }}</td>
+                        @endif
+                        <td>{{ $file->created_at->format('M j, Y \a\t g:i:s A') }}</td>
                         <td>
                             <div class="d-flex justify-content-center">
                                 @can('do-admin-stuff')
@@ -182,12 +209,26 @@
                     @endforeach
                 </tbody>
             </table>
+            @endif
+            <div class="mt-4 d-flex justify-content-end">
+                {{ $files->withQueryString()->links() }}
+            </div>
         </div>
     </div>
 </div>
 @endsection
 
 @section('scripts')
+<script>
+    $(document).ready( function () {
+            $('#fileIndexTable').DataTable({
+                order: [[2, 'desc']],
+                paging: false,
+                info: false,
+            });
+        });
+</script>
+
 <script>
     $(document).on('click', '#btn-delete-file', function(e) {
         e.preventDefault();

@@ -24,16 +24,16 @@ class FileController extends Controller
     {
         if(Gate::allows('do-admin-stuff')){
             if(request('show_deleted') == 1){
-                $files = File::onlyTrashed()->get();
+                $files = File::onlyTrashed()->paginate(10);
                 $folders = Folder::all();
             } else {
-                $files = File::all();
+                $files = File::orderBy('created_at', 'desc')->paginate(10);
                 $folders = Folder::all();
             }
         } else {
             $files = File::wherehas('user', function(Builder $query){
                 $query->where('role_id','=',Auth::user()->role_id);
-            })->get();
+            })->paginate(10);
 
             $folders = Folder::wherehas('user', function(Builder $query){
                 $query->where('role_id','=',Auth::user()->role_id);
@@ -41,7 +41,8 @@ class FileController extends Controller
         }
 
         $roles = Role::all();
-        $shared = Share::all();
+
+        
 
         return view('files.index', compact('files', 'folders', 'roles'));
     }
@@ -75,7 +76,7 @@ class FileController extends Controller
 
         $request->validate([
             'file' => 'required',
-            'file.*' => 'mimes:csv,txt,xlx,xls,pdf,jpg,jpeg,png,docx,pptx|max:8192'
+            'file.*' => 'mimes:csv,txt,xlsx,xls,pdf,jpg,jpeg,png,docx,pptx,zip,rar|max:8192'
         ]);
 
         if($request->hasfile('file')){

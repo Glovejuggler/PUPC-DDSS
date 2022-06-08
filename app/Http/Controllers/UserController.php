@@ -37,6 +37,9 @@ class UserController extends Controller
         //
     }
 
+    /**
+     * Checks if the email is already taken using AJAX
+     */
     public function emailcheck(Request $request)
     {
         if($request->get('email')) {

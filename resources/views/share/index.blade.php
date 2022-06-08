@@ -10,11 +10,12 @@
         <div class="card-body">
             <hr>
 
-            <table class="table table-bordered datatable dt-select" id="myTable">
+            <table class="table table-bordered hover compact" id="shareIndexTable">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Uploader</th>
+                        <th>Date uploaded</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -25,6 +26,7 @@
                         <td>{{ $file->user == NULL ? 'Deleted user' : $file->user->first_name.'
                             '.$file->user->last_name
                             }}</td>
+                        <td>{{ $file->created_at->format('M j, Y \a\t g:i:s A') }}</td>
                         <td>
                             <div class="d-flex justify-content-center">
                                 <a href="{{ route('file.download', $file->id) }}" download
@@ -37,12 +39,25 @@
                     @endforeach
                 </tbody>
             </table>
+            <div class="mt-4 d-flex justify-content-end">
+                {{ $files->links() }}
+            </div>
         </div>
     </div>
 </div>
 @endsection
 
 @section('scripts')
+<script>
+    $(document).ready( function () {
+            $('#shareIndexTable').DataTable({
+                order: [[2, 'desc']],
+                paging: false,
+                info: false,
+            });
+        });
+</script>
+
 <script>
     $(document).on('click', '#btn-delete-file', function(e) {
         e.preventDefault();

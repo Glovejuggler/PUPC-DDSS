@@ -7,7 +7,7 @@
             <h3 class="card-title">Edit Information</h3>
         </div>
         <div class="card-body">
-            <div class="row d-flec justify-content-center">
+            <div class="row d-flex justify-content-center">
                 <div class="col-6 md-auto">
                     <form action="{{ route('profile.update', $user->id) }}" method="post">
                         @csrf

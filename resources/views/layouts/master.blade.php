@@ -158,9 +158,11 @@
     <script>
         $(document).ready( function () {
             $('#myTable').DataTable();
-        } );
+        });
     </script>
+
     @include('sweetalert::alert')
+
     @yield('scripts')
 </body>
 

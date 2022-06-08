@@ -6,8 +6,11 @@ use App\Models\File;
 use App\Models\Role;
 use App\Models\Share;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ShareController extends Controller
 {
@@ -24,6 +27,8 @@ class ShareController extends Controller
         foreach ($shared as $shared_file) {
             $files[] = File::where('id','=',$shared_file->file_id)->first();
         }
+
+        $files = $this->paginate($files);
 
         // dd($files);
 
@@ -52,16 +57,6 @@ class ShareController extends Controller
      */
     public function create(Request $request)
     {
-        // foreach ($request->role_id as $role_id) {
-        //     Share::firstOrCreate([
-        //         'file_id' => $request->file_id,
-        //         'role_id' => $role_id,
-        //     ], [
-        //         'shared_by' => Auth::user()->id,
-        //         'shared_at' => now(),
-        //     ]);
-        // }
-
         if($request->has('role_id')) {
             foreach ($request->role_id as $role_id) {
                 Share::firstOrCreate([
@@ -133,5 +128,18 @@ class ShareController extends Controller
         return response()->json([
             'data' => $share
         ]);
+    }
+
+    /**
+     * Custom paginator (found somewhere in the internet)
+     * to paginate the pepega query in the index
+     * 
+     * @param array
+     */
+    public function paginate($items, $perPage = 5, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 }
