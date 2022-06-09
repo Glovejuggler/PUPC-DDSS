@@ -30,6 +30,11 @@ class HomeController extends Controller
      */
     public function index()
     {
+        /**
+         * Counts the files in the database
+         * If the user has the role of admin, counts all the files
+         * Otherwise, it only counts the files of the same role as the user
+         */
         $userCount = User::count();
         if(Gate::allows('do-admin-stuff')){
             $filecount = File::all()->count();
@@ -41,6 +46,9 @@ class HomeController extends Controller
 
         $roles = Role::all();
 
+        /**
+         * Counts files of each role to be displayed in a pie chart using ChartJS
+         */
         $count = [];
         foreach($roles as $role){
             $count[] = File::wherehas('user', function(Builder $query) use($role){
@@ -48,7 +56,6 @@ class HomeController extends Controller
             })->count();
         }
         
-        // return $count;
         return view('home', compact('userCount','filecount', 'roles', 'count'));
     }
 }

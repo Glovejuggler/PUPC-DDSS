@@ -35,6 +35,12 @@ class FolderController extends Controller
         return view('folders.index', compact('folders'));
     }
 
+    /** 
+     * Recovers the whole folder (including the files) from trash
+     * But it does not recover the files deleted before the folder is deleted
+     * 
+     * Got me? Kinda confusing, right? But's that's how it is :omegalul:
+     */
     public function recover($id)
     {
         $folder = Folder::onlyTrashed()->find($id);

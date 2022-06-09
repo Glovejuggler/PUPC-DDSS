@@ -22,18 +22,32 @@ class FileController extends Controller
      */
     public function index()
     {
+        /**
+         * Controls the pagination depending
+         * if viewed as grid or list
+         */
+        if(request('grid') == 1) {
+            $page = 18;
+        } else {
+            $page = 10;
+        }
+
+        /**
+         * Queries only the available files for the user
+         * depending on their role
+         */
         if(Gate::allows('do-admin-stuff')){
             if(request('show_deleted') == 1){
-                $files = File::onlyTrashed()->paginate(10);
+                $files = File::onlyTrashed()->orderBy('deleted_at', 'desc')->paginate($page);
                 $folders = Folder::all();
             } else {
-                $files = File::orderBy('created_at', 'desc')->paginate(10);
+                $files = File::orderBy('created_at', 'desc')->paginate($page);
                 $folders = Folder::all();
             }
         } else {
             $files = File::wherehas('user', function(Builder $query){
                 $query->where('role_id','=',Auth::user()->role_id);
-            })->paginate(10);
+            })->orderBy('created_at', 'desc')->paginate($page);
 
             $folders = Folder::wherehas('user', function(Builder $query){
                 $query->where('role_id','=',Auth::user()->role_id);
@@ -42,11 +56,12 @@ class FileController extends Controller
 
         $roles = Role::all();
 
-        
-
         return view('files.index', compact('files', 'folders', 'roles'));
     }
 
+    /**
+     * Restores file from trash
+     */
     public function recover($id)
     {
         File::withTrashed()->find($id)->restore();
@@ -79,6 +94,13 @@ class FileController extends Controller
             'file.*' => 'mimes:csv,txt,xlsx,xls,pdf,jpg,jpeg,png,docx,pptx,zip,rar|max:8192'
         ]);
 
+        /**
+         * Checks first if the request has file/s.
+         * Checks the number of files in the request and then finally
+         * uploading them.
+         * 
+         * TL;DR - Multiple upload :omegalul:
+         */
         if($request->hasfile('file')){
             $files = $request->file('file');
             $folderName = Folder::where('id','=',$request->folder_id)->first();
@@ -101,6 +123,9 @@ class FileController extends Controller
         return redirect()->back()->with('toast_success', 'File(s) uploaded successfully');
     }
 
+    /**
+     * Force downloads the files in the storage (not public)
+     */
     public function download($id)
     {
         $file = File::find($id);
@@ -149,9 +174,13 @@ class FileController extends Controller
      * @param  \App\Models\File  $file
      * @return \Illuminate\Http\Response
      */
+
+    /**
+     * Permanently deletes the file in the storage
+     * Decided not to use it and use archiving method instead
+     */
     public function destroy(File $file)
     {
-        // This permanently deletes the file in the folder
         // if(Storage::disk('public')->exists('files/'.$file->folder->folderName.'/'.$file->fileName)){
         //     Storage::disk('public')->delete('files/'.$file->folder->folderName.'/'.$file->fileName);
         // }

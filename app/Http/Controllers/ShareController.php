@@ -17,6 +17,8 @@ class ShareController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * Pepega query, I know. But hey, it works.
+     * 
      * @return \Illuminate\Http\Response
      */
     public function index()
@@ -29,8 +31,6 @@ class ShareController extends Controller
         }
 
         $files = $this->paginate($files);
-
-        // dd($files);
 
         return view('share.index', compact('files'));
     }
@@ -52,6 +52,10 @@ class ShareController extends Controller
     /**
      * Store a newly created resource in storage.
      *
+     * Creates a new share instance of the file
+     * This works like a magic for me
+     * If a checkbox in the request is unchecked, it also removes the share in the database
+     * 
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
@@ -121,6 +125,11 @@ class ShareController extends Controller
         //
     }
 
+    /**
+     * Was supposed to use AJAX and modal for the sharing of files
+     * It was hard to learn and might not reach the deadline
+     * Decided not to use it, might use later tho
+     */
     public function shareThisFile(File $file)
     {
         $share = Share::where('file_id','=',$file->id);

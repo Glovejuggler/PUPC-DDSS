@@ -85,136 +85,202 @@
                 </nav>
             </div>
             @if (request('grid') == 1)
-            @forelse ($files as $file)
-            <h3>{{ $file->fileName }}</h3>
-            @empty
-            <h3>No data to display</h3>
-            @endforelse
-            @else
-            <table class="table table-bordered hover compact" id="fileIndexTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Uploader</th>
-                        @if(request('show_deleted') == 1)
-                        <th>Date deleted</th>
-                        @endif
-                        <th>Date uploaded</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($files as $file)
-                    <tr>
-                        <td>{{ $file->fileName }}</td>
-                        <td>{{ $file->user == NULL ? 'Deleted user' : $file->user->first_name.'
-                            '.$file->user->last_name
-                            }}</td>
-                        @if(request('show_deleted') == 1)
-                        <td>{{ $file->deleted_at->format('M j, Y \a\t g:i:s A') }}</td>
-                        @endif
-                        <td>{{ $file->created_at->format('M j, Y \a\t g:i:s A') }}</td>
-                        <td>
-                            <div class="d-flex justify-content-center">
+            <div class="row mt-2 ml-3">
+                @forelse ($files as $file)
+                <div class="card mx-1 mt-2" style="width: 12rem;" data-toggle="popover" data-trigger="hover"
+                    title="{{ $file->fileName }}">
+                    <img src=" https://www.pngall.com/wp-content/uploads/2018/05/Files-PNG-File.png"
+                        class="card-img-top mt-2" alt="...">
+                    <div class="card-body">
+                        <div class="col-auto">
+                            <p class="card-text text-truncate">{{
+                                $file->fileName }}</p>
+                        </div>
+                        <h6 class="card-subtitle text-muted">{{ $file->user->first_name.' '.
+                            $file->user->last_name }}</h6>
+                        <div class="dropdown d-flex justify-content-end">
+                            <i class="fas fa-ellipsis-vertical" type="button" id="dropdownMenu{{ $file->id }}"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            </i>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu{{ $file->id }}">
+                                <li><a href="{{ route('file.download', $file->id) }}" class="dropdown-item"
+                                        type="button">Download</a></li>
                                 @can('do-admin-stuff')
                                 @if (request('show_deleted') == 1)
-                                <a href="{{ route('file.recover', $file->id) }}"
-                                    class="btn btn-sm btn-success mr-1">Restore</a>
+                                <li><a href="{{ route('file.recover', $file->id) }}" class="dropdown-item"
+                                        type="button">Restore</a></li>
                                 @endif
                                 @endcan
-                                <a href="{{ route('file.download', $file->id) }}" download
-                                    class="btn btn-sm btn-primary">
-                                    <i class="fas fa-download"></i>
-                                </a>
                                 @if(!request('show_deleted') == 1)
-                                <button type="submit" class="btn btn-danger btn-sm mx-1" data-bs-toggle="modal"
-                                    data-bs-target="#removeFileModal" data-url="{{route('file.destroy', $file->id)}}"
-                                    id="btn-delete-file">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <a href="{{ route('share.file', $file->id) }}" class="btn btn-secondary btn-sm">
-                                    <i class="fas fa-share-nodes"></i>
-                                </a>
+                                <li><button class="dropdown-item" type="submit" data-bs-toggle="modal"
+                                        data-bs-target="#removeFileModal"
+                                        data-url="{{route('file.destroy', $file->id)}}"
+                                        id="btn-delete-file">Delete</button>
+                                </li>
+                                <li><a href="{{ route('share.file', $file->id) }}" class="dropdown-item"
+                                        type="button">Share</a></li>
                                 @endif
+                            </ul>
 
-                                {{-- Delete Confirm Modal --}}
-                                <div class="modal fade" id="removeFileModal" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="removeFileLabel">Confirmation</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <form action="{{route('file.destroy', $file->id)}}" method="POST"
-                                                id="removeFileModalForm">
-                                                @method('DELETE')
-                                                @csrf
-                                                <div class="modal-body">
-                                                    Are you sure you want to delete this file?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-sm btn-secondary"
-                                                        data-bs-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        <i class="fas fa-trash"></i> Delete
-                                                    </button>
-                                                </div>
-                                            </form>
+                            {{-- Delete Confirm Modal --}}
+                            <div class="modal fade" id="removeFileModal" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="removeFileLabel">Confirmation</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
                                         </div>
-                                    </div>
-                                </div>
-
-                                {{-- Share File Modal --}}
-                                <div class="modal fade" id="shareFileModal" data-bs-backdrop="static"
-                                    data-bs-keyboard="false" tabindex="-1" aria-labelledby="shareFileModalLabel"
-                                    aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="shareFileModalLabel">Share file</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
+                                        <form action="{{route('file.destroy', $file->id)}}" method="POST"
+                                            id="removeFileModalForm">
+                                            @method('DELETE')
+                                            @csrf
                                             <div class="modal-body">
-                                                <div class="alert alert-info" role="alert">
-                                                    This feature is not yet working
-                                                </div>
-                                                @foreach ($roles as $role)
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox"
-                                                        value="{{ $role->id }}" id="defaultCheck1">
-                                                    <label class="form-check-label" for="defaultCheck1">
-                                                        {{ $role->roleName }}
-                                                    </label>
-                                                </div>
-                                                @endforeach
+                                                Are you sure you want to delete this file?
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
+                                                <button type="button" class="btn btn-sm btn-secondary"
                                                     data-bs-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary" onclick="displayLoading()"
-                                                    id="upload">
-                                                    <span class="spinner-border spinner-border-sm" role="status"
-                                                        aria-hidden="true" style="display: none"></span>
-                                                    <span id="uploadtxt">Share</span></button>
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
                                             </div>
-                                            </form>
-                                        </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            @endif
-            <div class="mt-4 d-flex justify-content-end">
-                {{ $files->withQueryString()->links() }}
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <h3>No data to display</h3>
+                @endforelse
             </div>
         </div>
+        @else
+        <table class="table table-bordered hover compact" id="fileIndexTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Uploader</th>
+                    @if(request('show_deleted') == 1)
+                    <th>Date deleted</th>
+                    @endif
+                    <th>Date uploaded</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($files as $file)
+                <tr>
+                    <td>{{ $file->fileName }}</td>
+                    <td>{{ $file->user == NULL ? 'Deleted user' : $file->user->first_name.'
+                        '.$file->user->last_name
+                        }}</td>
+                    @if(request('show_deleted') == 1)
+                    <td>{{ $file->deleted_at->format('M j, Y \a\t g:i:s A') }}</td>
+                    @endif
+                    <td>{{ $file->created_at->format('M j, Y \a\t g:i:s A') }}</td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            @can('do-admin-stuff')
+                            @if (request('show_deleted') == 1)
+                            <a href="{{ route('file.recover', $file->id) }}"
+                                class="btn btn-sm btn-success mr-1">Restore</a>
+                            @endif
+                            @endcan
+                            <a href="{{ route('file.download', $file->id) }}" download class="btn btn-sm btn-primary">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            @if(!request('show_deleted') == 1)
+                            <button type="submit" class="btn btn-danger btn-sm mx-1" data-bs-toggle="modal"
+                                data-bs-target="#removeFileModal" data-url="{{route('file.destroy', $file->id)}}"
+                                id="btn-delete-file">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <a href="{{ route('share.file', $file->id) }}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-share-nodes"></i>
+                            </a>
+                            @endif
+
+                            {{-- Delete Confirm Modal --}}
+                            <div class="modal fade" id="removeFileModal" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="removeFileLabel">Confirmation</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <form action="{{route('file.destroy', $file->id)}}" method="POST"
+                                            id="removeFileModalForm">
+                                            @method('DELETE')
+                                            @csrf
+                                            <div class="modal-body">
+                                                Are you sure you want to delete this file?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-sm btn-secondary"
+                                                    data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Share File Modal --}}
+                            <div class="modal fade" id="shareFileModal" data-bs-backdrop="static"
+                                data-bs-keyboard="false" tabindex="-1" aria-labelledby="shareFileModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="shareFileModalLabel">Share file</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="alert alert-info" role="alert">
+                                                This feature is not yet working
+                                            </div>
+                                            @foreach ($roles as $role)
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="{{ $role->id }}"
+                                                    id="defaultCheck1">
+                                                <label class="form-check-label" for="defaultCheck1">
+                                                    {{ $role->roleName }}
+                                                </label>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary" onclick="displayLoading()"
+                                                id="upload">
+                                                <span class="spinner-border spinner-border-sm" role="status"
+                                                    aria-hidden="true" style="display: none"></span>
+                                                <span id="uploadtxt">Share</span></button>
+                                        </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @endif
+        <div class="mt-4 d-flex justify-content-end">
+            {{ $files->withQueryString()->links() }}
+        </div>
     </div>
+</div>
 </div>
 @endsection
 

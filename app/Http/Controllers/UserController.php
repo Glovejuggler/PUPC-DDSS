@@ -140,6 +140,9 @@ class UserController extends Controller
         return redirect()->back()->with('toast_success', "User deleted successfully");
     }
 
+    /**
+     * Shows a view that displays the user's information
+     */
     public function profile()
     {
         $user = Auth::user();
@@ -148,6 +151,10 @@ class UserController extends Controller
         return view('users.profile', compact('user', 'files'));
     }
 
+    /**
+     * Displays a form to edit the user's information
+     * Changing of password is included
+     */
     public function profile_edit()
     {
         $user = User::findorfail(Auth::user()->id);
@@ -156,6 +163,9 @@ class UserController extends Controller
         return view('users.profile_edit', compact('user', 'roles'));
     }
 
+    /**
+     * Updates the user information
+     */
     public function profile_update(Request $request)
     {
         $user = User::findorfail(Auth::user()->id);
@@ -171,6 +181,9 @@ class UserController extends Controller
         return redirect()->route('home')->with('toast_success', 'Profile updated successfully');
     }
 
+    /**
+     * Updates the user's password
+     */
     public function change_password(Request $request)
     {
         $user = User::findorfail(Auth::user()->id);
