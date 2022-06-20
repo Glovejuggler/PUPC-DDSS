@@ -6,7 +6,7 @@
 
 First, download or just run this command:
 ```
-git clone https:://www.github.com/Glovejuggler/PUPC-DDSS
+git clone https://www.github.com/Glovejuggler/PUPC-DDSS
 ```
 
 Then, `cd` to the app:
