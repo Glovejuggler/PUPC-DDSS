@@ -59,21 +59,21 @@ class ShareController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create(Request $request, $id)
     {
         if($request->has('role_id')) {
             foreach ($request->role_id as $role_id) {
                 Share::firstOrCreate([
-                    'file_id' => $request->file_id,
+                    'file_id' => $id,
                     'role_id' => $role_id,
                 ], [
                     'shared_by' => Auth::user()->id,
                     'shared_at' => now(),
                 ]);
             }
-            Share::where('file_id','=',$request->file_id)->whereNotIn('role_id', $request->role_id)->delete();
+            Share::where('file_id','=',$id)->whereNotIn('role_id', $request->role_id)->delete();
         } else {
-            Share::where('file_id','=',$request->file_id)->delete();
+            Share::where('file_id','=',$id)->delete();
         }
 
 

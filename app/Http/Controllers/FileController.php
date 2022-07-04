@@ -55,8 +55,11 @@ class FileController extends Controller
         }
 
         $roles = Role::all();
+        $shares = Share::all();
 
-        return view('files.index', compact('files', 'folders', 'roles'));
+        $share_roles = Role::where('id','!=',Auth::user()->role_id)->get();
+
+        return view('files.index', compact('files', 'folders', 'roles', 'share_roles', 'shares'));
     }
 
     /**
@@ -153,7 +156,7 @@ class FileController extends Controller
      */
     public function edit(File $file)
     {
-        //
+        return view('files.edit', compact('file'));
     }
 
     /**
@@ -163,9 +166,17 @@ class FileController extends Controller
      * @param  \App\Models\File  $file
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, File $file)
+    public function rename(Request $request, File $file)
     {
-        //
+        $file_path = 'public/files/'.$file->folder->folderName.'/'.$file->fileName;
+        $extension = pathinfo(storage_path($file->filePath), PATHINFO_EXTENSION);
+        $target_path = 'public/files/'.$file->folder->folderName.'/'.$request->fileName.'.'.$extension;
+
+        Storage::move($file_path, $target_path);
+        $file->fileName = $request->fileName.'.'.$extension;
+        $file->update();
+
+        return redirect()->route('file.index')->with('toast_success', 'Rename successful');
     }
 
     /**

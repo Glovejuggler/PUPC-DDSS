@@ -12,7 +12,6 @@
             @csrf
             @method('POST')
             <div class="card-body">
-                <input type="text" class="form-control" name="file_id" value="{{ $file->id }}" hidden>
                 @forelse ($roles as $role)
                 @if ($role->id != Auth::user()->role_id)
                 <div class="form-check">

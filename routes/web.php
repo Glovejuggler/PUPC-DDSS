@@ -28,6 +28,7 @@ Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+// This checks if the email is already taken when adding a new user
 Route::post('/emailcheck', [UserController::class, 'emailcheck'])->name('email.check');
 
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -61,8 +62,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('file/download/{id}', [FileController::class, 'download'])->name('file.download');
     Route::delete('/file/delete/{file}', [FileController::class, 'destroy'])->name('file.destroy');
     Route::get('/file/recover/{id}', [FileController::class, 'recover'])->name('file.recover');
+    Route::get('file/{file}/rename', [FileController::class, 'edit'])->name('file.edit');
+    Route::put('file/{file}/rename/update', [FileController::class, 'rename'])->name('file.rename');
     
     Route::get('/file/{id}/share', [ShareController::class, 'share'])->name('share.file');
-    Route::post('/share', [ShareController::class, 'create'])->name('share.sharefile');
+    Route::post('/share/{id}', [ShareController::class, 'create'])->name('share.sharefile');
     Route::get('/shared_files', [ShareController::class, 'index'])->name('share.index');
 });
