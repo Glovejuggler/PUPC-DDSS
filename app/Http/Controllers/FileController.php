@@ -27,7 +27,7 @@ class FileController extends Controller
          * if viewed as grid or list
          */
         if(request('grid') == 1) {
-            $page = 18;
+            $page = 15;
         } else {
             $page = 10;
         }
@@ -55,11 +55,13 @@ class FileController extends Controller
         }
 
         $roles = Role::all();
-        $shares = Share::all();
 
+        $shares = Share::all();
         $share_roles = Role::where('id','!=',Auth::user()->role_id)->get();
 
-        return view('files.index', compact('files', 'folders', 'roles', 'share_roles', 'shares'));
+        $image = ['jpg', 'jpeg', 'png', 'bmp'];
+
+        return view('files.index', compact('files', 'folders', 'roles', 'share_roles', 'shares', 'image'));
     }
 
     /**
@@ -110,7 +112,7 @@ class FileController extends Controller
 
             foreach($files as $file){
                 $name = $file->getClientOriginalName();
-                $path = $file->storeAs('files/'.$folderName->folderName, $name, 'public');
+                $path = $file->storeAs($folderName->folderName, $name, 'public');
 
                 File::create([
                     'fileName' => $name,
@@ -168,9 +170,9 @@ class FileController extends Controller
      */
     public function rename(Request $request, File $file)
     {
-        $file_path = 'public/files/'.$file->folder->folderName.'/'.$file->fileName;
+        $file_path = 'public/'.$file->folder->folderName.'/'.$file->fileName;
         $extension = pathinfo(storage_path($file->filePath), PATHINFO_EXTENSION);
-        $target_path = 'public/files/'.$file->folder->folderName.'/'.$request->fileName.'.'.$extension;
+        $target_path = 'public/'.$file->folder->folderName.'/'.$request->fileName.'.'.$extension;
 
         Storage::move($file_path, $target_path);
         $file->fileName = $request->fileName.'.'.$extension;

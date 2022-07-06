@@ -76,8 +76,8 @@ class FolderController extends Controller
 
         $folder->folderName = $request->folderName;
         $folder->user_id = Auth::user()->id;
-        if(!Storage::exists('files/'.$request->folderName)){
-            Storage::disk('public')->makeDirectory('files/'.$request->folderName);
+        if(!Storage::exists($request->folderName)){
+            Storage::disk('public')->makeDirectory($request->folderName);
         }
         
 

@@ -1,0 +1,6 @@
+If thumbnail doesn't show but works (can be seen when the image is status 500 in the console):
+1. Go to XAMPP's php.ini file
+2. Change ;extension=gd(x) to extension=gd(x)
+
+If it still doesn't work and the status in the console is 404
+1. Add the port to the APP_URL in the .env (basically add :8000 at the end)
