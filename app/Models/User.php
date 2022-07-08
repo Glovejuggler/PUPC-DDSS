@@ -50,4 +50,11 @@ class User extends Authenticatable
     public function role(){
         return $this->belongsTo(Role::class);
     }
+
+    /**
+     * Returns full name of the user without the middle name
+     */
+    public function full_name() {
+        return $this->first_name.' '.$this->last_name;
+    }
 }

@@ -70,6 +70,7 @@
                                     class="btn btn-sm btn-success mr-1">Restore</a>
                                 @endif
                                 @endcan
+                                @if (request('show_deleted') != 1)
                                 <a href="{{ route('folder.show', $folder->id) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-eye"></i>
                                 </a>
@@ -78,6 +79,7 @@
                                     data-url="{{route('folder.destroy', $folder->id)}}" id="btn-delete-folder">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                @endif
 
                                 {{-- Delete Confirm Modal --}}
                                 <div class="modal fade" id="removeFolderModal" aria-hidden="true">

@@ -85,11 +85,10 @@
                 </nav>
             </div>
             @if (request('grid') == 1)
-            <div class="row mt-2 ml-3">
+            <div class="row mt-2 ml-3 justify-content-center">
                 @forelse ($files as $file)
                 <div class="card mx-1 mt-2" style="width: 12rem;" data-toggle="popover" data-trigger="hover"
                     title="{{ $file->fileName }}">
-                    {{-- @if(pathinfo(storage_path($file->filePath), PATHINFO_EXTENSION) == ) --}}
                     @if (in_array(pathinfo(storage_path($file->filePath), PATHINFO_EXTENSION), $image))
                     <img src="{{ Thumbnail::src('/'.$file->filePath, 'public')->smartcrop(200, 200)->url() }}"
                         class="card-img-top mt-2">
@@ -99,9 +98,10 @@
                     @endif
 
                     <div class="card-body">
-                        <p class="card-text">{{ Str::limit($file->fileName, 17, '...') }}</p>
-                        <h6 class="card-subtitle text-muted">{{ $file->user->first_name.' '.
-                            $file->user->last_name }}</h6>
+                        <div class="col-auto px-0">
+                            <p class="card-text text-truncate">{{ $file->fileName }}</p>
+                        </div>
+                        <h6 class="card-subtitle text-muted">{{ $file->user->full_name() }}</h6>
                         <div class="dropdown d-flex justify-content-end">
                             <i class="fas fa-ellipsis-vertical" type="button" id="dropdownMenu{{ $file->id }}"
                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -109,8 +109,10 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu{{ $file->id }}">
                                 <li><a href="{{ route('file.download', $file->id) }}" class="dropdown-item"
                                         type="button">Download</a></li>
+                                @if (request('show_deleted') != 1)
                                 <li><a href="#" class="dropdown-item" data-bs-toggle="modal"
                                         data-bs-target="#renameModal{{ $file->id }}">Rename</a></li>
+                                @endif
                                 @can('do-admin-stuff')
                                 @if (request('show_deleted') == 1)
                                 <li><a href="{{ route('file.recover', $file->id) }}" class="dropdown-item"
@@ -161,7 +163,9 @@
                 @include('files.modal._rename')
                 @include('files.modal._share')
                 @empty
-                <h3>No data to display</h3>
+                <div class="d-flex justify-content-center">
+                    <h5 class="text-muted">No files to display</h5>
+                </div>
                 @endforelse
             </div>
             @else
@@ -275,12 +279,5 @@
         const url = $(this).data('url');
         $('#removeFileModalForm').attr('action', url);
     });
-
-    function displayLoading(){
-        e.preventDefault();
-        document.getElementById('loading').style.display = "inline-block"
-        document.getElementById('upload').disabled = true;
-        document.getElementById('uploadtxt').innerHTML = 'Uploading';
-    }
 </script>
 @endsection

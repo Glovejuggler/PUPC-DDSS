@@ -1,4 +1,4 @@
-<!-- Modal -->
+<!-- Share Modal -->
 <div class="modal fade" id="shareModal{{ $file->id }}" id="staticBackdrop" data-bs-backdrop="static"
     data-bs-keyboard="false" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -30,7 +30,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-sm btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Share</button>
                 </div>
             </form>
         </div>
