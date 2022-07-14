@@ -49,7 +49,13 @@ class FolderController extends Controller
             ->where('folder_id','=',$id)
             ->whereBetween('deleted_at', [$folder->deleted_at, now()])
             ->restore();
-        Folder::withTrashed()->find($id)->restore();
+        $folder = Folder::withTrashed()->find($id)->restore();
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($folder)
+            ->event('restored')
+            ->log('Restored a folder');
 
         return redirect()->back()->with('toast_success', 'Folder restored');
     }
@@ -79,9 +85,14 @@ class FolderController extends Controller
         if(!Storage::exists($request->folderName)){
             Storage::disk('public')->makeDirectory($request->folderName);
         }
-        
 
         $folder->save();
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($folder)
+            ->event('created')
+            ->log('Created a folder');
 
         return redirect()->route('folder.index')->with('toast_success', 'Folder added successfully');
     }
@@ -137,6 +148,12 @@ class FolderController extends Controller
         // }
         $folder->delete();
         File::where('folder_id','=',$folder->id)->delete();
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($folder)
+            ->event('deleted')
+            ->log('Deleted a folder');
 
         return redirect()->route('folder.index')->with('toast_success', 'Folder deleted successfully');
     }

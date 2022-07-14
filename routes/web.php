@@ -68,4 +68,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/file/{id}/share', [ShareController::class, 'share'])->name('share.file');
     Route::post('/share/{id}', [ShareController::class, 'create'])->name('share.sharefile');
     Route::get('/shared_files', [ShareController::class, 'index'])->name('share.index');
+
+    Route::get('/search', [FileController::class, 'search'])->name('file.search');
 });

@@ -13,7 +13,8 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
         "realrashid/sweet-alert": "^5.0",
-        "rolandstarke/laravel-thumbnail": "^1.0"
+        "rolandstarke/laravel-thumbnail": "^1.0",
+        "spatie/laravel-activitylog": "^4.5"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

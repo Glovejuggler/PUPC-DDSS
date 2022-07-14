@@ -20,39 +20,19 @@ class FileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         /**
          * Controls the pagination depending
          * if viewed as grid or list
          */
         if(request('grid') == 1) {
-            $page = 15;
+            $files = $this->queryFiles()->paginate(15);
         } else {
-            $page = 10;
+            $files = $this->queryFiles()->get();
         }
-
-        /**
-         * Queries only the available files for the user
-         * depending on their role
-         */
-        if(Gate::allows('do-admin-stuff')){
-            if(request('show_deleted') == 1){
-                $files = File::onlyTrashed()->orderBy('deleted_at', 'desc')->paginate($page);
-                $folders = Folder::all();
-            } else {
-                $files = File::orderBy('created_at', 'desc')->paginate($page);
-                $folders = Folder::all();
-            }
-        } else {
-            $files = File::wherehas('user', function(Builder $query){
-                $query->where('role_id','=',Auth::user()->role_id);
-            })->orderBy('created_at', 'desc')->paginate($page);
-
-            $folders = Folder::wherehas('user', function(Builder $query){
-                $query->where('role_id','=',Auth::user()->role_id);
-            })->get();
-        }
+        
+        $folders = $this->queryFolders();
 
         $roles = Role::all();
 
@@ -60,7 +40,7 @@ class FileController extends Controller
         $share_roles = Role::where('id','!=',Auth::user()->role_id)->get();
 
         $image = ['jpg', 'jpeg', 'png', 'bmp'];
-
+        
         return view('files.index', compact('files', 'folders', 'roles', 'share_roles', 'shares', 'image'));
     }
 
@@ -69,7 +49,13 @@ class FileController extends Controller
      */
     public function recover($id)
     {
-        File::withTrashed()->find($id)->restore();
+        $file = File::withTrashed()->find($id)->restore();
+
+        activity()
+                    ->causedBy(Auth::user())
+                    ->performedOn($file)
+                    ->event('restored')
+                    ->log('Restored a file');
 
         return redirect()->back()->with('toast_success', 'File restored');
     }
@@ -114,7 +100,7 @@ class FileController extends Controller
                 $name = $file->getClientOriginalName();
                 $path = $file->storeAs($folderName->folderName, $name, 'public');
 
-                File::create([
+                $newFile = File::create([
                     'fileName' => $name,
                     'filePath' => $path,
                     'folder_id' => $request->folder_id,
@@ -122,6 +108,12 @@ class FileController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+
+                activity()
+                    ->causedBy(Auth::user())
+                    ->performedOn($newFile)
+                    ->event('uploaded')
+                    ->log('Uploaded a file');
             }
         }
 
@@ -135,6 +127,12 @@ class FileController extends Controller
     {
         $file = File::find($id);
         $path = str_replace('\\', '/', storage_path()).'/app/public/'.$file->filePath;
+
+        activity()
+                    ->causedBy(Auth::user())
+                    ->performedOn($file)
+                    ->event('downloaded')
+                    ->log('Downloaded a file');
         
         return response()->download($path);
     }
@@ -178,6 +176,12 @@ class FileController extends Controller
         $file->fileName = $request->fileName.'.'.$extension;
         $file->update();
 
+        activity()
+                    ->causedBy(Auth::user())
+                    ->performedOn($file)
+                    ->event('renamed')
+                    ->log('Renamed a file');
+
         return redirect()->route('file.index')->with('toast_success', 'Rename successful');
     }
 
@@ -198,8 +202,94 @@ class FileController extends Controller
         //     Storage::disk('public')->delete('files/'.$file->folder->folderName.'/'.$file->fileName);
         // }
         $file->delete();
+
+        activity()
+                    ->causedBy(Auth::user())
+                    ->performedOn($file)
+                    ->event('deleted')
+                    ->log('Deleted a file');
         
 
         return redirect()->back()->with('toast_success', 'File deleted successfully');
+    }
+
+
+    /**
+     * The most inefficient way just for searching the files in grid view
+     * This could be improved or there really is an easier way of doing this
+     * But I have to make it work before presentation
+     * No one's gonna see this tho, I think lmao
+     * 
+     * Update: I kinda made it look clean :omegalul:
+     */
+    public function search(Request $request)
+    {
+        $roles = Role::all();
+
+        $shares = Share::all();
+        $share_roles = Role::where('id','!=',Auth::user()->role_id)->get();
+
+        $image = ['jpg', 'jpeg', 'png', 'bmp'];
+
+        if($request->ajax()) {
+            if($request->search != 0){
+                $files = $this->queryFiles()->where('fileName','LIKE','%'.$request->search.'%')->paginate(15);
+                $folders = $this->queryFolders();
+            } else {
+                $files = $this->queryFiles()->paginate(15);
+                $folders = $this->queryFolders();
+            }
+
+            if($files->count() > 0) {
+                return view('files.partials.gridview', compact('files', 'folders', 'roles', 'share_roles', 'shares', 'image'))->render();
+            } else {
+                return 'File not found';
+            }
+        }
+    }
+
+    /**
+     * Function to query the files according to the role of the user.
+     * Queries are intentionally left incomplete so it can be used in
+     * different situations.
+     */
+    public function queryFiles()
+    {
+        if(Gate::allows('do-admin-stuff')){
+            if(request('show_deleted') == 1){
+                $files = File::onlyTrashed()->orderBy('deleted_at', 'desc');
+            } else {
+                $files = File::orderBy('created_at', 'desc');
+            }
+        } else {
+            $files = File::wherehas('user', function(Builder $query){
+                $query->where('role_id','=',Auth::user()->role_id);
+            })->orderBy('created_at', 'desc');
+        }
+
+        return $files;
+    }
+
+
+    /**
+     * Function to query the folders according to the role of the user.
+     * Unlike above function, the queries are complete as no further
+     * requirements are to be met when fetching the data.
+     */
+    public function queryFolders()
+    {
+        if(Gate::allows('do-admin-stuff')){
+            if(request('show_deleted') == 1){
+                $folders = Folder::all();
+            } else {
+                $folders = Folder::all();
+            }
+        } else {
+            $folders = Folder::wherehas('user', function(Builder $query){
+                $query->where('role_id','=',Auth::user()->role_id);
+            })->get();
+        }
+
+        return $folders;
     }
 }

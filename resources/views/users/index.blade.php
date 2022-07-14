@@ -194,12 +194,12 @@
 <script>
     $(document).ready(function(){
 
-        $('#email').blur(function(){
+        $('#email').on('keyup',function(){
             var error_email = '';
             var email = $('#email').val();
             var _token = $('input[name="_token"]').val();
             var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-            if(!filter.test(email)) {    
+            if(!filter.test(email)) {
                 $('#error_email').html('<label class="text-danger">Invalid email</label>');
                 $('#email').addClass('has-error');
                 $('#register').attr('disabled', 'disabled');

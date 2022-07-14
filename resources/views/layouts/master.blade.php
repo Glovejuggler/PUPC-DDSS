@@ -8,6 +8,8 @@
     <title>{{ config('app.name') }}</title>
 
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
+    <meta name="_token" content="{{ csrf_token() }}">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
@@ -15,11 +17,14 @@
 
         {{-- Header/Navbar --}}
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button" data-enable-remember="true"><i
                             class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="navbar-brand">Polytechnic University of the Philippines Calauan
+                        Campus</a>
                 </li>
             </ul>
 
