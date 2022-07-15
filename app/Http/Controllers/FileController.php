@@ -6,6 +6,7 @@ use App\Models\File;
 use App\Models\Role;
 use App\Models\Share;
 use App\Models\Folder;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -129,10 +130,10 @@ class FileController extends Controller
         $path = str_replace('\\', '/', storage_path()).'/app/public/'.$file->filePath;
 
         activity()
-                    ->causedBy(Auth::user())
-                    ->performedOn($file)
-                    ->event('downloaded')
-                    ->log('Downloaded a file');
+            ->causedBy(Auth::user())
+            ->performedOn($file)
+            ->event('downloaded')
+            ->log('Downloaded a file');
         
         return response()->download($path);
     }
@@ -172,15 +173,16 @@ class FileController extends Controller
         $extension = pathinfo(storage_path($file->filePath), PATHINFO_EXTENSION);
         $target_path = 'public/'.$file->folder->folderName.'/'.$request->fileName.'.'.$extension;
 
-        Storage::move($file_path, $target_path);
         $file->fileName = $request->fileName.'.'.$extension;
+        $file->filePath = Str::after($target_path, 'public/');
         $file->update();
+        Storage::move($file_path, $target_path);
 
         activity()
-                    ->causedBy(Auth::user())
-                    ->performedOn($file)
-                    ->event('renamed')
-                    ->log('Renamed a file');
+            ->causedBy(Auth::user())
+            ->performedOn($file)
+            ->event('renamed')
+            ->log('Renamed a file');
 
         return redirect()->route('file.index')->with('toast_success', 'Rename successful');
     }

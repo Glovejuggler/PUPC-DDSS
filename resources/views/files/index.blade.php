@@ -188,11 +188,11 @@
 @section('scripts')
 <script>
     $(document).ready( function () {
-            $('#fileIndexTable').DataTable({
-                order: [[2, 'desc']],
-                info: false,
-            });
+        $('#fileIndexTable').DataTable({
+            order: [[2, 'desc']],
+            info: false,
         });
+    });
 </script>
 
 <script>
@@ -213,7 +213,7 @@
                 url: '{{ route('file.search') }}',
                 data: {'search':search},
                 success: function(data) {
-                    console.log(data);
+                    // console.log(data);
                     $('#gridView').html(data);
                 },
             })

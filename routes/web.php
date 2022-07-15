@@ -5,8 +5,9 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\FolderController;
 use App\Http\Controllers\ShareController;
+use App\Http\Controllers\AvatarController;
+use App\Http\Controllers\FolderController;
 
 
 /*
@@ -47,9 +48,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
-    Route::get('/profile/edit', [UserController::class, 'profile_edit'])->name('profile.edit');
+    Route::get('/password/change', [UserController::class, 'password_edit'])->name('password.edit');
     Route::put('profile/update', [UserController::class, 'profile_update'])->name('profile.update');
     Route::put('/change_password', [UserController::class, 'change_password'])->name('change_password');
+    Route::post('/change_pfp', [AvatarController::class, 'store'])->name('avatar.change');
 
     Route::get('/folders', [FolderController::class, 'index'])->name('folder.index');
     Route::post('/folder/create', [FolderController::class, 'store'])->name('folder.store');
@@ -62,7 +64,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('file/download/{id}', [FileController::class, 'download'])->name('file.download');
     Route::delete('/file/delete/{file}', [FileController::class, 'destroy'])->name('file.destroy');
     Route::get('/file/recover/{id}', [FileController::class, 'recover'])->name('file.recover');
-    Route::get('file/{file}/rename', [FileController::class, 'edit'])->name('file.edit');
     Route::put('file/{file}/rename/update', [FileController::class, 'rename'])->name('file.rename');
     
     Route::get('/file/{id}/share', [ShareController::class, 'share'])->name('share.file');

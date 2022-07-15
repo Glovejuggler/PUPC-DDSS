@@ -8,8 +8,11 @@
     <title>{{ config('app.name') }}</title>
 
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @yield('css')
 
     <meta name="_token" content="{{ csrf_token() }}">
+
+    @yield('preload')
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
@@ -29,6 +32,8 @@
             </ul>
 
             <ul class="navbar-nav ml-auto">
+                <img src="{{ MyAvatar::getAvatar(Auth::user()->id, 50) }}" alt="" class="rounded-circle my-auto"
+                    style="width: 15%; height: 15%">
                 <li class="nav-item dropdown">
                     <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

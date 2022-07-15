@@ -6,6 +6,7 @@ use Alert;
 use App\Models\File;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Avatar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -147,20 +148,20 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $files = File::where('user_id','=',$user->id)->get();
+        $avatar = Avatar::where('user_id','=',$user->id)->latest()->first();
 
-        return view('users.profile', compact('user', 'files'));
+        return view('users.profile', compact('user', 'files', 'avatar'));
     }
 
     /**
      * Displays a form to edit the user's information
      * Changing of password is included
      */
-    public function profile_edit()
+    public function password_edit()
     {
         $user = User::findorfail(Auth::user()->id);
-        $roles = Role::all();
 
-        return view('users.profile_edit', compact('user', 'roles'));
+        return view('users.password_edit', compact('user'));
     }
 
     /**
@@ -178,7 +179,7 @@ class UserController extends Controller
 
         $user->update();
 
-        return redirect()->route('home')->with('toast_success', 'Profile updated successfully');
+        return redirect()->back()->with('toast_success', 'Profile updated successfully');
     }
 
     /**

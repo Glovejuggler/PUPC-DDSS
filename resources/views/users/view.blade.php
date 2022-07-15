@@ -1,5 +1,24 @@
 @extends('layouts.master')
 
+@section('css')
+<style>
+    .avatar-container {
+        position: relative;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: transparent;
+    }
+
+    .avatar-img {
+        object-fit: cover;
+        opacity: 1;
+        transition: opacity .2s ease-in-out;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container">
     <div class="card mt-4">
@@ -11,7 +30,10 @@
         </div>
         <div class="card-body">
             <div class="row d-flex justify-content-center">
-                <div class="col-6 md-auto">
+                <div class="d-flex justify-content-center avatar-container">
+                    <img src="{{ MyAvatar::getAvatar($user->id, 250) }}" alt="" class="avatar-img">
+                </div>
+                <div class="ml-lg-4 col-lg-6">
                     <label for="first_name" class="form-label">First name</label>
                     <div class="input-group mb-2">
                         <input type="text" name="first_name" class="form-control" id="first_name"

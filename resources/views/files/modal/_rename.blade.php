@@ -12,7 +12,10 @@
                     @csrf
                     @method('PUT')
                     <label for="newFileName" class="form-label">Rename to:</label>
-                    <input type="text" class="form-control" id="newFileName" name="fileName">
+                    <input type="text" class="form-control" id="newFileName{{ $file->id }}" name="fileName" value={{
+                        Str::beforeLast($file->fileName, '.'.pathinfo(storage_path($file->filePath),
+                    PATHINFO_EXTENSION))
+                    }}>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -22,3 +25,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    var modal{{ $file->id }} = document.getElementById('renameModal{{ $file->id }}')
+    modal{{ $file->id }}.addEventListener('shown.bs.modal', function (event) {
+        const input = document.getElementById('newFileName{{ $file->id }}');
+        input.select();
+    })
+</script>

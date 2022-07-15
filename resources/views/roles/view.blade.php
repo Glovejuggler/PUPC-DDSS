@@ -23,12 +23,15 @@
                     @foreach ($users as $user)
                     <tr>
                         <td>{{ $user->id }}</td>
-                        <td>{{ $user->first_name.' '.$user->middle_name.' '.$user->last_name }}</td>
+                        <td><img src="{{ MyAvatar::getAvatar($user->id, 50) }}" alt="" class="rounded-circle mr-2"
+                                style="width: 10%; height: 10%"> {{ $user->first_name.' '.$user->middle_name.'
+                            '.$user->last_name }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->address }}</td>
                         <td>{{ $user->role==NULL ? 'Unassigned' : $user->role->roleName }}</td>
                         <td>
                             <div class="d-flex justify-content-center">
+                                @if ($user->id != 1)
                                 <a href="{{ route('user.show', $user->id) }}">
                                     <button type="button" class="btn btn-sm btn-primary ml-1"><i
                                             class="fas fa-eye"></i></button></a>
@@ -63,6 +66,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                @else
+                                <button class="btn btn-sm btn-outline-danger" disabled>Cannot take action</button>
+                                @endif
                             </div>
                         </td>
                     </tr>
