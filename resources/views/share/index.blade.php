@@ -15,6 +15,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Uploader</th>
+                        <th>Shared by</th>
                         <th>Date uploaded</th>
                         <th>Actions</th>
                     </tr>
@@ -22,14 +23,14 @@
                 <tbody>
                     @foreach ($files as $file)
                     <tr>
-                        <td>{{ $file->fileName }}</td>
-                        <td>{{ $file->user == NULL ? 'Deleted user' : $file->user->first_name.'
-                            '.$file->user->last_name
+                        <td>{{ $file->file->fileName }}</td>
+                        <td>{{ $file->file->user == NULL ? 'Deleted user' : $file->file->user->full_name()
                             }}</td>
-                        <td>{{ $file->created_at->format('M j, Y \a\t g:i:s A') }}</td>
+                        <td>{{ $file->user == NULL ? 'Deleted user' : $file->user->full_name() }}</td>
+                        <td>{{ $file->file->created_at->format('M j, Y \a\t g:i:s A') }}</td>
                         <td>
                             <div class="d-flex justify-content-center">
-                                <a href="{{ route('file.download', $file->id) }}" download
+                                <a href="{{ route('file.download', $file->file->id) }}" download
                                     class="btn btn-sm btn-primary">
                                     <i class="fas fa-download"></i>
                                 </a>
@@ -51,7 +52,7 @@
 <script>
     $(document).ready( function () {
             $('#shareIndexTable').DataTable({
-                order: [[2, 'desc']],
+                order: [[3, 'desc']],
                 paging: false,
                 info: false,
             });

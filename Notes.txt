@@ -4,3 +4,44 @@ If thumbnail doesn't show but works (can be seen when the image is status 500 in
 
 If it still doesn't work and the status in the console is 404
 1. Add the port to the APP_URL in the .env (basically add :8000 at the end)
+
+
+Custom CSS
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 9px;
+    /* width of the entire scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #f8fafc;
+    /* color of the tracking area */
+    border: 2px solid #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #343a40;
+    /* color of the scroll thumb */
+    border-radius: 20px;
+    /* roundness of the scroll thumb */
+    border: 2px solid #f8fafc;
+    /* creates padding around scroll thumb */
+}
+
+/* Custom theme */
+.main-sidebar,
+.brand-link {
+    background-color: #202225 !important;
+}
+
+.sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
+.nav-treeview>.nav-item>.nav-link.active {
+    background-color: #800000 !important;
+    color: #fff !important;
+}
+
+.nav-sidebar>.nav-item.menu-open>.nav-link {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* End of custom theme */

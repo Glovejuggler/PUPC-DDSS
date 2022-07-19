@@ -8,6 +8,7 @@
     <title>{{ config('app.name') }}</title>
 
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/datatables.css') }}">
     @yield('css')
 
     <meta name="_token" content="{{ csrf_token() }}">
@@ -15,7 +16,7 @@
     @yield('preload')
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
     <div class="wrapper">
 
         {{-- Header/Navbar --}}
@@ -79,8 +80,7 @@
                             </a>
                         </li>
                         @can('do-admin-stuff')
-                        <li
-                            class="nav-item {{ Request::is('users') || Request::is('roles') ? 'menu-open' : 'menu-close' }}">
+                        <li class="nav-item {{ Request::is('users', 'roles*', 'user*') ? 'menu-open' : 'menu-close' }}">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>
@@ -91,14 +91,14 @@
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="{{ route('user.index') }}"
-                                        class="nav-link {{ Request::is('users') ? 'active' : '' }}">
+                                        class="nav-link {{ Request::is('users', 'user*') ? 'active' : '' }}">
                                         <i class="fas fa-user-group nav-icon"></i>
                                         <p>Users</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('role.index') }}"
-                                        class="nav-link {{ Request::is('roles') ? 'active' : '' }}">
+                                        class="nav-link {{ Request::is('roles*') ? 'active' : '' }}">
                                         <i class="fas fa-briefcase nav-icon"></i>
                                         <p>Roles</p>
                                     </a>
@@ -107,7 +107,7 @@
                         </li>
                         @endcan
                         <li
-                            class="nav-item {{ Request::is('files') || Request::is('folders') || Request::is('shared_files') ? 'menu-open' : 'menu-close' }}">
+                            class="nav-item {{ Request::is('files*', 'shared_files', 'trash') ? 'menu-open' : 'menu-close' }}">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-folder-tree"></i>
                                 <p>
@@ -117,19 +117,21 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="{{ route('folder.index') }}"
-                                        class="nav-link {{ Request::is('folders') ? 'active' : '' }}">
-                                        <i class="fas fa-folder nav-icon"></i>
-                                        <p>Folders</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('file.index') }}"
-                                        class="nav-link {{ Request::is('files') ? 'active' : '' }}">
+                                    <a href="{{ Cookie::get('view') == 'grid' ? route('file.index').'?grid=1' : route('file.index') }}"
+                                        class="nav-link {{ Request::is('files*') ? 'active' : '' }}">
                                         <i class="fas fa-file nav-icon"></i>
                                         <p>Files</p>
                                     </a>
                                 </li>
+                                @can('do-admin-stuff')
+                                <li class="nav-item">
+                                    <a href="{{ route('file.trash') }}"
+                                        class="nav-link {{ Request::is('trash') ? 'active' : '' }}">
+                                        <i class="fas fa-trash nav-icon"></i>
+                                        <p>Trash</p>
+                                    </a>
+                                </li>
+                                @endcan
                                 @cannot('do-admin-stuff')
                                 <li class="nav-item">
                                     <a href="{{ route('share.index') }}"

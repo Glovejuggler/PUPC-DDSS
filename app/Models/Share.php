@@ -11,11 +11,11 @@ class Share extends Model
     use HasFactory;
 
     public function file(){
-        return $this->hasMany(File::class);
+        return $this->hasOne(File::class, 'id', 'file_id');
     }
 
     public function user(){
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'shared_by');
     }
 
     protected $fillable = [

@@ -14,29 +14,19 @@
         </div>
         <h6 class="card-subtitle text-muted">{{ $file->user->full_name() }}</h6>
         <div class="dropdown d-flex justify-content-end">
-            <i class="fas fa-ellipsis-vertical" type="button" id="dropdownMenu{{ $file->id }}" data-bs-toggle="dropdown"
+            <i class="fas fa-ellipsis" type="button" id="dropdownMenu{{ $file->id }}" data-bs-toggle="dropdown"
                 aria-expanded="false">
             </i>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu{{ $file->id }}">
                 <li><a href="{{ route('file.download', $file->id) }}" class="dropdown-item" type="button">Download</a>
                 </li>
-                @if (request('show_deleted') != 1)
                 <li><a href="#" class="dropdown-item" data-bs-toggle="modal"
                         data-bs-target="#renameModal{{ $file->id }}">Rename</a></li>
-                @endif
-                @can('do-admin-stuff')
-                @if (request('show_deleted') == 1)
-                <li><a href="{{ route('file.recover', $file->id) }}" class="dropdown-item" type="button">Restore</a>
-                </li>
-                @endif
-                @endcan
-                @if(!request('show_deleted') == 1)
                 <li><button class="dropdown-item" type="submit" data-bs-toggle="modal" data-bs-target="#removeFileModal"
                         data-url="{{route('file.destroy', $file->id)}}" id="btn-delete-file">Delete</button>
                 </li>
                 <li><a href="#" class="dropdown-item" data-bs-toggle="modal"
                         data-bs-target="#shareModal{{ $file->id }}">Share</a></li>
-                @endif
             </ul>
 
             {{-- Delete Confirm Modal --}}

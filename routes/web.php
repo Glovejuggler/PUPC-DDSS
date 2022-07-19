@@ -44,6 +44,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/role/create', [RoleController::class, 'store'])->name('role.store');
     Route::delete('/role/delete/{role}', [RoleController::class, 'destroy'])->name('role.destroy');
     Route::get('roles/{id}/users', [RoleController::class, 'show'])->name('role.show');
+
+    Route::get('/trash', [FileController::class, 'trash_index'])->name('file.trash');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -59,7 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/folder/{id}/files', [FolderController::class, 'show'])->name('folder.show');
     Route::get('/folder/recover/{id}', [FolderController::class, 'recover'])->name('folder.recover');
 
-    Route::get('/files', [FileController::class, 'index'])->name('file.index');
+    Route::get('/files/{id?}', [FileController::class, 'index'])->name('file.index');
     Route::post('/file/create', [FileController::class, 'store'])->name('file.store');
     Route::get('file/download/{id}', [FileController::class, 'download'])->name('file.download');
     Route::delete('/file/delete/{file}', [FileController::class, 'destroy'])->name('file.destroy');
@@ -71,4 +73,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/shared_files', [ShareController::class, 'index'])->name('share.index');
 
     Route::get('/search', [FileController::class, 'search'])->name('file.search');
+    Route::get('/search_trash', [FileController::class, 'search_trash'])->name('trash.search');
+
+    Route::get('/drive/{id?}', [FileController::class, 'drive'])->name('drive');
 });

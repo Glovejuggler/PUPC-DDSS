@@ -8,11 +8,15 @@ use App\Models\Share;
 use App\Models\Folder;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Database\Eloquent\Builder;
+use RahulHaque\Filepond\Facades\Filepond;
 
 class FileController extends Controller
 {
@@ -21,28 +25,36 @@ class FileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $id = NULL)
     {
         /**
          * Controls the pagination depending
          * if viewed as grid or list
          */
         if(request('grid') == 1) {
-            $files = $this->queryFiles()->paginate(15);
+            Cookie::queue('view', 'grid', 2628000);
+            $files = $this->queryFiles()
+                        ->where('folder_id','=',$id)
+                        ->paginate(15);
         } else {
-            $files = $this->queryFiles()->get();
+            Cookie::queue('view', 'list', 2628000);
+            $files = $this->queryFiles()
+                        ->where('folder_id','=',$id)
+                        ->get();
         }
         
-        $folders = $this->queryFolders();
+        $folders = $this->queryFolders()
+                        ->where('parent_folder_id','=',$id);
 
         $roles = Role::all();
 
         $shares = Share::all();
         $share_roles = Role::where('id','!=',Auth::user()->role_id)->get();
+        $current_folder = Folder::find($id);
 
         $image = ['jpg', 'jpeg', 'png', 'bmp'];
         
-        return view('files.index', compact('files', 'folders', 'roles', 'share_roles', 'shares', 'image'));
+        return view('files.drive', compact('files', 'folders', 'roles', 'share_roles', 'shares', 'image', 'current_folder'));
     }
 
     /**
@@ -50,13 +62,14 @@ class FileController extends Controller
      */
     public function recover($id)
     {
-        $file = File::withTrashed()->find($id)->restore();
+        $file = File::withTrashed()->find($id);
+        $file->restore();
 
         activity()
-                    ->causedBy(Auth::user())
-                    ->performedOn($file)
-                    ->event('restored')
-                    ->log('Restored a file');
+                ->causedBy(Auth::user())
+                ->performedOn($file)
+                ->event('restored')
+                ->log('Restored a file');
 
         return redirect()->back()->with('toast_success', 'File restored');
     }
@@ -81,10 +94,10 @@ class FileController extends Controller
     {
         $userid = Auth::user()->id;
 
-        $request->validate([
-            'file' => 'required',
-            'file.*' => 'mimes:csv,txt,xlsx,xls,pdf,jpg,jpeg,png,docx,pptx,zip,rar|max:8192'
-        ]);
+        // $request->validate([
+        //     'file' => 'required',
+        //     'file.*' => 'mimes:csv,txt,xlsx,xls,pdf,jpg,jpeg,png,docx,pptx,zip,rar|max:8192'
+        // ]);
 
         /**
          * Checks first if the request has file/s.
@@ -93,13 +106,17 @@ class FileController extends Controller
          * 
          * TL;DR - Multiple upload :omegalul:
          */
-        if($request->hasfile('file')){
-            $files = $request->file('file');
-            $folderName = Folder::where('id','=',$request->folder_id)->first();
+            $files = Filepond::field($request->file)->getFile();
+
+            $folder = Folder::where('id','=',$request->folder_id)->first();
 
             foreach($files as $file){
                 $name = $file->getClientOriginalName();
-                $path = $file->storeAs($folderName->folderName, $name, 'public');
+                if(!$folder == NULL){
+                    $path = $file->storeAs($folder->folderName, $name, 'public');
+                } else {
+                    $path = $file->storeAs('/', $name, 'public');
+                }
 
                 $newFile = File::create([
                     'fileName' => $name,
@@ -116,7 +133,6 @@ class FileController extends Controller
                     ->event('uploaded')
                     ->log('Uploaded a file');
             }
-        }
 
         return redirect()->back()->with('toast_success', 'File(s) uploaded successfully');
     }
@@ -126,7 +142,7 @@ class FileController extends Controller
      */
     public function download($id)
     {
-        $file = File::find($id);
+        $file = File::withTrashed()->find($id);
         $path = str_replace('\\', '/', storage_path()).'/app/public/'.$file->filePath;
 
         activity()
@@ -169,9 +185,14 @@ class FileController extends Controller
      */
     public function rename(Request $request, File $file)
     {
-        $file_path = 'public/'.$file->folder->folderName.'/'.$file->fileName;
+        if($file->folder == NULL){
+            $folderName = NULL;
+        } else {
+            $folderName = $file->folder->folderName.'/';
+        }
+        $file_path = 'public/'.$folderName.$file->fileName;
         $extension = pathinfo(storage_path($file->filePath), PATHINFO_EXTENSION);
-        $target_path = 'public/'.$file->folder->folderName.'/'.$request->fileName.'.'.$extension;
+        $target_path = 'public/'.$folderName.$request->fileName.'.'.$extension;
 
         $file->fileName = $request->fileName.'.'.$extension;
         $file->filePath = Str::after($target_path, 'public/');
@@ -234,16 +255,25 @@ class FileController extends Controller
         $image = ['jpg', 'jpeg', 'png', 'bmp'];
 
         if($request->ajax()) {
-            if($request->search != 0){
-                $files = $this->queryFiles()->where('fileName','LIKE','%'.$request->search.'%')->paginate(15);
-                $folders = $this->queryFolders();
+            if($request->search != NULL){
+                $files = $this->queryFiles()
+                                ->where('folder_id','=',$request?->folder)
+                                ->where('fileName','LIKE','%'.$request->search.'%')
+                                ->paginate(15);
+                $folders = $this->queryFolders()
+                                ->where('parent_folder_id','=',$request?->folder);
             } else {
-                $files = $this->queryFiles()->paginate(15);
-                $folders = $this->queryFolders();
+                $files = $this->queryFiles()
+                                ->where('folder_id','=',$request?->folder)
+                                ->paginate(15);
+                $folders = $this->queryFolders()
+                                ->where('parent_folder_id','=',$request?->folder);
             }
 
             if($files->count() > 0) {
-                return view('files.partials.gridview', compact('files', 'folders', 'roles', 'share_roles', 'shares', 'image'))->render();
+                return view('files.partials.gridview',
+                        compact('files', 'folders', 'roles', 'share_roles', 'shares', 'image'))
+                        ->render();
             } else {
                 return 'File not found';
             }
@@ -254,15 +284,13 @@ class FileController extends Controller
      * Function to query the files according to the role of the user.
      * Queries are intentionally left incomplete so it can be used in
      * different situations.
+     * 
+     * $files = File::onlyTrashed()->orderBy('deleted_at', 'desc');
      */
     public function queryFiles()
     {
         if(Gate::allows('do-admin-stuff')){
-            if(request('show_deleted') == 1){
-                $files = File::onlyTrashed()->orderBy('deleted_at', 'desc');
-            } else {
-                $files = File::orderBy('created_at', 'desc');
-            }
+            $files = File::orderBy('created_at', 'desc');
         } else {
             $files = File::wherehas('user', function(Builder $query){
                 $query->where('role_id','=',Auth::user()->role_id);
@@ -281,17 +309,61 @@ class FileController extends Controller
     public function queryFolders()
     {
         if(Gate::allows('do-admin-stuff')){
-            if(request('show_deleted') == 1){
-                $folders = Folder::all();
-            } else {
-                $folders = Folder::all();
-            }
+            $folders = Folder::all();
         } else {
             $folders = Folder::wherehas('user', function(Builder $query){
                 $query->where('role_id','=',Auth::user()->role_id);
-            })->get();
+            });
         }
 
         return $folders;
+    }
+
+    /**
+     * Displays all the files that are trashed
+     */
+    public function trash_index()
+    {
+        if(request('grid') == 1) {
+            $files = $this->queryFiles()->onlyTrashed()->paginate(15);
+        } else {
+            $files = $this->queryFiles()->onlyTrashed()->get();
+        }
+        
+        $folders = $this->queryFolders();
+
+        $image = ['jpg', 'jpeg', 'png', 'bmp'];
+
+        return view('files.trash', compact('files', 'folders', 'image'));
+    }
+
+
+    /**
+     * This function searches for the files in the trash
+     * It's an AJAX call like the search()
+     * But for some reason that same function cannot be used for this
+     */
+    public function search_trash(Request $request)
+    {
+        $image = ['jpg', 'jpeg', 'png', 'bmp'];
+
+        if($request->ajax()) {
+            if($request->search != NULL){
+                $files = $this->queryFiles()
+                                ->onlyTrashed()
+                                ->where('fileName','LIKE','%'.$request->search.'%')
+                                ->paginate(15);
+                $folders = $this->queryFolders();
+            } else {
+                $files = $this->queryFiles()->onlyTrashed()->paginate(15);
+                $folders = $this->queryFolders();
+            }
+
+            if($files->count() > 0) {
+                return view('files.partials.trash_gridview', compact('files', 'folders', 'image'))->render();
+            } else {
+                return 'File not found';
+            }
+        }
     }
 }

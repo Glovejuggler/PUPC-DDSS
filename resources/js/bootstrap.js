@@ -4,7 +4,9 @@ try {
     global.$ = global.jQuery = require('jquery');
     require('@popperjs/core');
     require('bootstrap');
-    require('datatables.net');
+    require('datatables.net-dt');
+    require('datatables.net-responsive-dt');
+    require('datatables.net-select-dt');
     require('admin-lte');
 } catch (e) {}
 

@@ -23,14 +23,7 @@ class ShareController extends Controller
      */
     public function index()
     {
-        $shared = Share::where('role_id','=',Auth::user()->role_id)->get();
-
-        $files = [];
-        foreach ($shared as $shared_file) {
-            $files[] = File::where('id','=',$shared_file->file_id)->first();
-        }
-
-        $files = $this->paginate($files);
+        $files = Share::where('role_id','=',Auth::user()->role_id)->paginate(10);
 
         return view('share.index', compact('files'));
     }
@@ -123,32 +116,5 @@ class ShareController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    /**
-     * Was supposed to use AJAX and modal for the sharing of files
-     * It was hard to learn and might not reach the deadline
-     * Decided not to use it, might use later tho
-     */
-    public function shareThisFile(File $file)
-    {
-        $share = Share::where('file_id','=',$file->id);
-
-        return response()->json([
-            'data' => $share
-        ]);
-    }
-
-    /**
-     * Custom paginator (found somewhere in the internet)
-     * to paginate the pepega query in the index
-     * 
-     * @param array
-     */
-    public function paginate($items, $perPage = 5, $page = null, $options = [])
-    {
-        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
-        $items = $items instanceof Collection ? $items : Collection::make($items);
-        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 }

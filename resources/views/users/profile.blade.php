@@ -71,8 +71,7 @@
             <div class="row d-flex flex-row justify-content-center">
                 <div class="col-auto">
                     <div class="d-flex justify-content-center avatar-container">
-                        <img src="{{ Thumbnail::src('/'.$avatar->path, 'public')->crop(250, 250)->url() }}" alt=""
-                            class="avatar-img">
+                        <img src="{{ MyAvatar::getAvatar(Auth::user()->id, 250) }}" alt="" class="avatar-img">
                         <div class="avatar-content" data-bs-toggle="modal" data-bs-target="#avatarChange">
                             <span class="avatar-icon"><i class="fas fa-camera"></i></span>
                             <span class="avatar-text">Change profile picture</span>

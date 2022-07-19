@@ -82,6 +82,7 @@ class FolderController extends Controller
 
         $folder->folderName = $request->folderName;
         $folder->user_id = Auth::user()->id;
+        $folder->parent_folder_id = $request->parent_folder_id;
         if(!Storage::exists($request->folderName)){
             Storage::disk('public')->makeDirectory($request->folderName);
         }
@@ -94,7 +95,7 @@ class FolderController extends Controller
             ->event('created')
             ->log('Created a folder');
 
-        return redirect()->route('folder.index')->with('toast_success', 'Folder added successfully');
+        return redirect()->back()->with('toast_success', 'Folder added successfully');
     }
 
     /**
@@ -155,6 +156,6 @@ class FolderController extends Controller
             ->event('deleted')
             ->log('Deleted a folder');
 
-        return redirect()->route('folder.index')->with('toast_success', 'Folder deleted successfully');
+        return redirect()->back()->with('toast_success', 'Folder deleted successfully');
     }
 }
