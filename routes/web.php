@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\AvatarController;
 use App\Http\Controllers\FolderController;
+use App\Http\Controllers\ActivityLogController;
 
 
 /*
@@ -60,6 +61,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/folder/delete/{folder}', [FolderController::class, 'destroy'])->name('folder.destroy');
     Route::get('/folder/{id}/files', [FolderController::class, 'show'])->name('folder.show');
     Route::get('/folder/recover/{id}', [FolderController::class, 'recover'])->name('folder.recover');
+    Route::post('/folder/share/{id}', [FolderController::class, 'share'])->name('folder.share');
+    Route::put('/folder/{id}/rename', [FolderController::class, 'update'])->name('folder.rename');
 
     Route::get('/files/{id?}', [FileController::class, 'index'])->name('file.index');
     Route::post('/file/create', [FileController::class, 'store'])->name('file.store');
@@ -68,12 +71,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/file/recover/{id}', [FileController::class, 'recover'])->name('file.recover');
     Route::put('file/{file}/rename/update', [FileController::class, 'rename'])->name('file.rename');
     
-    Route::get('/file/{id}/share', [ShareController::class, 'share'])->name('share.file');
+    // Route::get('/file/{id}/share', [ShareController::class, 'share'])->name('share.file');
     Route::post('/share/{id}', [ShareController::class, 'create'])->name('share.sharefile');
     Route::get('/shared_files', [ShareController::class, 'index'])->name('share.index');
+    Route::get('/share/view/{id}', [ShareController::class, 'show'])->name('share.view');
 
     Route::get('/search', [FileController::class, 'search'])->name('file.search');
     Route::get('/search_trash', [FileController::class, 'search_trash'])->name('trash.search');
 
-    Route::get('/drive/{id?}', [FileController::class, 'drive'])->name('drive');
+    Route::get('/activities', [ActivityLogController::class, 'index'])->name('activity.log');
 });

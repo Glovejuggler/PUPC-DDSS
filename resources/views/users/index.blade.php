@@ -103,7 +103,7 @@
                     @foreach ($users as $user)
                     <tr>
                         <td>{{ $user->id }}</td>
-                        <td><img src="{{ MyAvatar::getAvatar($user->id, 50) }}" alt="" class="rounded-circle mr-2"
+                        <td><img src="{{ DDSS::getAvatar($user->id, 50) }}" alt="" class="rounded-circle mr-2"
                                 style="width: 10%; height: 10%"> {{
                             $user->first_name.' '.$user->middle_name.' '.$user->last_name }}</td>
                         <td>{{ $user->email }}</td>

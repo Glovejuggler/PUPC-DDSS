@@ -14,12 +14,17 @@ class Share extends Model
         return $this->hasOne(File::class, 'id', 'file_id');
     }
 
+    public function folder(){
+        return $this->hasOne(Folder::class, 'id', 'folder_id');
+    }
+
     public function user(){
         return $this->belongsTo(User::class, 'shared_by');
     }
 
     protected $fillable = [
         'file_id',
+        'folder_id',
         'role_id',
         'shared_at',
         'shared_by',

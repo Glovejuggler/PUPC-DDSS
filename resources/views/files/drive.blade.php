@@ -13,7 +13,7 @@
 
 @section('content')
 <div class="container">
-    <form action="{{ route('file.store') }}" method="post">
+    <form action=" {{ route('file.store') }}" method="post">
         @csrf
         <input type="file" name="file[]" required multiple />
         <p class="help-block">{{ $errors->first('file.*') }}</p>
@@ -26,7 +26,7 @@
                 {{ $current_folder ? $current_folder->folderName : 'Root' }}
             </h3>
         </div>
-        <div class="card-body overflow-auto">
+        <div class="card-body overflow-hidden">
             <div class="d-flex justify-content-between">
                 <button type="button" class="btn btn-sm btn-primary mb-2" data-bs-toggle="modal"
                     data-bs-target="#addFolderModal"><i class="fas fa-folder-plus"></i> Create folder</button>
@@ -69,7 +69,7 @@
             </div>
             <hr>
             @if ($current_folder)
-            <a href="{{ route('file.index', $current_folder->parent_folder_id) }}"
+            <a href="{{ request('grid') == 1 ? route('file.index', $current_folder->parent_folder_id).'?grid=1' : route('file.index', $current_folder->parent_folder_id) }}"
                 class="btn btn-sm btn-outline-secondary mb-4"><i class="fas fa-level-up"></i> Back</a>
             @endif
             @if (request('grid') == 1)
@@ -79,7 +79,7 @@
                         aria-describedby="button-addon2" name="search" id="search">
                 </div>
             </div>
-            <div class="row mt-2 px-3 justify-content-center" id="gridView">
+            <div class="row mt-2 px-2" id="gridView">
                 @include('files.partials.gridview')
             </div>
             @else
@@ -88,7 +88,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Uploader</th>
-                        <th></th>
+                        <th>Date uploaded</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -108,11 +108,34 @@
                                 <a href="{{ route('file.index', $folder->id) }}" class="btn btn-sm btn-primary"><i
                                         class="fas fa-folder-open"></i>
                                     Open</a>
-                                <button type="submit" class="btn btn-danger btn-sm ml-1" data-bs-toggle="modal"
-                                    data-bs-target="#removeFolderModal"
-                                    data-url="{{route('folder.destroy', $folder->id)}}" id="btn-delete-folder">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-secondary ml-1"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis"></i>
+                                    </button>
+                                    <ul class="dropdown-menu" id="dropdownmenu{{ $folder->id }}">
+                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                data-bs-target="#renameFolderModal{{ $folder->id }}"><i
+                                                    class="fas fa-edit"></i>
+                                                Rename</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                data-bs-target="#shareFolderModal{{ $folder->id }}"><i
+                                                    class="fas fa-share-nodes"></i>
+                                                Share</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                data-bs-target="#removeFolderModal"
+                                                data-url="{{route('folder.destroy', $folder->id)}}"
+                                                id="btn-delete-folder"><i class="fas fa-trash"></i>
+                                                Delete</a>
+                                        </li>
+                                    </ul>
+                                    @include('folders.modal._rename')
+                                    @include('folders.modal._share')
+                                </div>
 
                                 {{-- Delete Confirm Modal --}}
                                 <div class="modal fade" id="removeFolderModal" aria-hidden="true">
@@ -234,10 +257,13 @@
             columnDefs: [
                 {
                     targets: [3],
-                    orderData: [2, 3],
+                    orderable: false,
                 },
             ],
-            order: [[2, 'desc']],
+            "order": [
+                [ 0, 'asc' ],
+                [ 2, 'desc' ]
+            ],
             info: false,
         });
     });

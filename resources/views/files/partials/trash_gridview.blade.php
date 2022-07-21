@@ -1,9 +1,37 @@
+@if($folders->isNotEmpty())
+<h5 class="fw-bold">Folders</h5>
+@forelse ($folders as $folder)
+<div class="card col-lg-2 col-md-3 px-0 py-0 mx-1 mb-2">
+    <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <span>
+                <i class="fas fa-folder text-yellow"></i> {{ $folder->folderName }}
+            </span>
+            <span>
+                <i class="fas fa-ellipsis-vertical" type="button" id="dropdownMenu{{ $folder->id }}"
+                    data-bs-toggle="dropdown" aria-expanded="false"></i>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu{{ $folder->id }}">
+                    </li>
+                    <li><a href="{{ route('folder.recover', $folder->id) }}" class="dropdown-item">Restore</a>
+                    </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+</div>
+@empty
+<h6>No folders to display</h6>
+@endforelse
+@endif
+
+@if($files->isNotEmpty())
+<h5 class=" fw-bold">Files</h5>
+@endif
 @forelse ($files as $file)
-<div class="card mx-1 mt-2" style="width: 12rem;" data-toggle="popover" data-trigger="hover"
+<div class="card mx-1 mt-2 mt-2 col-md-3 col-lg-2" data-toggle="popover" data-trigger="hover"
     title="{{ $file->fileName }}">
     @if (in_array(pathinfo(storage_path($file->filePath), PATHINFO_EXTENSION), $image))
-    <img src="{{ Thumbnail::src('/'.$file->filePath, 'public')->smartcrop(200, 200)->url() }}"
-        class="card-img-top mt-2">
+    <img src="{{ Thumbnail::src('/'.$file->filePath, 'public')->crop(200, 200)->url() }}" class="card-img-top mt-2">
     @else
     <img src="https://www.pngall.com/wp-content/uploads/2018/05/Files-PNG-File.png" class="card-img-top mt-2" alt="...">
     @endif
@@ -27,9 +55,11 @@
     </div>
 </div>
 @empty
+@if($folders->isEmpty())
 <div class="d-flex justify-content-center">
     <h5 class="text-muted">No files to display</h5>
 </div>
+@endif
 @endforelse
 <div class="mt-4 d-flex justify-content-end">
     {{ $files->withQueryString()->links() }}

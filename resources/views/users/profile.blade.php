@@ -202,7 +202,7 @@
                         <td>{{ $file->fileName }}</td>
                         <td>
                             <div class="d-flex justify-content-center">
-                                <a href="#" class="btn btn-sm btn-primary">
+                                <a href="{{ route('file.download', $file->id) }}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-download"></i>
                                 </a>
                                 <button type="submit" class="btn btn-danger btn-sm mx-1" data-bs-toggle="modal"

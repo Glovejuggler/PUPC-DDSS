@@ -28,10 +28,5 @@ class DatabaseSeeder extends Seeder
         DB::table('roles')->insert([
             'roleName' => 'Admin',
         ]);
-
-        DB::table('folders')->insert([
-            'folderName' => 'root',
-            'user_id' => '1',
-        ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
+use App\Models\Share;
 use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,13 +50,14 @@ class FolderController extends Controller
             ->where('folder_id','=',$id)
             ->whereBetween('deleted_at', [$folder->deleted_at, now()])
             ->restore();
-        $folder = Folder::withTrashed()->find($id)->restore();
+        $folder = Folder::withTrashed()->find($id);
+        $folder->restore();
 
         activity()
             ->causedBy(Auth::user())
             ->performedOn($folder)
             ->event('restored')
-            ->log('Restored a folder');
+            ->log('restored a folder');
 
         return redirect()->back()->with('toast_success', 'Folder restored');
     }
@@ -93,7 +95,8 @@ class FolderController extends Controller
             ->causedBy(Auth::user())
             ->performedOn($folder)
             ->event('created')
-            ->log('Created a folder');
+            ->withProperties(['name' => $folder->folderName])
+            ->log('created a folder');
 
         return redirect()->back()->with('toast_success', 'Folder added successfully');
     }
@@ -132,7 +135,32 @@ class FolderController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if(Storage::disk('public')->exists($request->folderName)){
+            return redirect()->back()->with('toast_error', 'Folder already exists');
+        }
+
+        $folder = Folder::find($id);
+
+        $oldDir = $folder->folderName;
+        $folder->folderName = $request->folderName;
+
+        $files = File::where('folder_id','=',$id)->get();
+        foreach($files as $file){
+            $file->filePath = $folder->folderName.'/'.$file->fileName;
+            $file->update();
+        }
+
+        $folder->update();
+        Storage::disk('public')->move($oldDir, $folder->folderName);
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($folder)
+            ->event('renamed')
+            ->withProperties(['old_name' => $oldDir, 'new_name' => $folder->folderName])
+            ->log('renamed a folder');
+
+        return redirect()->back()->with('toast_success', 'Folder renamed');
     }
 
     /**
@@ -147,15 +175,40 @@ class FolderController extends Controller
         // if(Storage::disk('public')->exists('files/'.$folder->folderName)){
         //     Storage::disk('public')->deleteDirectory('files/'.$folder->folderName);
         // }
-        $folder->delete();
-        File::where('folder_id','=',$folder->id)->delete();
 
         activity()
             ->causedBy(Auth::user())
             ->performedOn($folder)
             ->event('deleted')
-            ->log('Deleted a folder');
+            ->withProperties(['name' => $folder->folderName])
+            ->log('deleted a folder');
+
+        $folder->delete();
+        File::where('folder_id','=',$folder->id)->delete();
 
         return redirect()->back()->with('toast_success', 'Folder deleted successfully');
+    }
+
+    /**
+     * Shares the folder to other roles
+     */
+    public function share(Request $request, $id)
+    {
+        if($request->has('role_id')) {
+            foreach ($request->role_id as $role_id) {
+                Share::firstOrCreate([
+                    'folder_id' => $id,
+                    'role_id' => $role_id,
+                ], [
+                    'shared_by' => Auth::user()->id,
+                    'shared_at' => now(),
+                ]);
+            }
+            Share::where('folder_id','=',$id)->whereNotIn('role_id', $request->role_id)->delete();
+        } else {
+            Share::where('folder_id','=',$id)->delete();
+        }
+
+        return redirect()->back()->with('toast_success', 'Successfully shared folder');
     }
 }

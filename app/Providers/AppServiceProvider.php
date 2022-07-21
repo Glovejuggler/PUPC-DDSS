@@ -28,13 +28,5 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Paginator::useBootstrap();
-
-        view()->composer('*', function ($view) {
-            if(Auth::check()){
-                $myavatar = Avatar::where('user_id','=',Auth::user()->id)->latest()->first();
-                
-                View::share('myavatar', $myavatar);
-            }
-        });
     }
 }

@@ -9,8 +9,7 @@
         </div>
         <div class="card-body">
             <hr>
-
-            <table class="table table-bordered hover compact" id="shareIndexTable">
+            <table class="hover compact" id="shareIndexTable">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -21,6 +20,25 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @forelse ($folders as $folder)
+                    <tr>
+                        <td><a href="{{ route('share.view', $folder->folder->id) }}"
+                                class="text-decoration-none text-dark"><i class="fas fa-folder text-yellow"></i>
+                                {{ $folder->folder->folderName }}</a>
+                        </td>
+                        <td>{{ $folder->folder->user->full_name() }}</td>
+                        <td>{{ $folder->user->full_name() }}</td>
+                        <td>{{ $folder->folder->created_at->format('M j, Y \a\t g:i:s A') }}</td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ route('share.view', $folder->folder->id) }}"
+                                    class="btn btn-sm btn-primary"><i class="fas fa-folder-open"></i> Open</a>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+
+                    @endforelse
                     @foreach ($files as $file)
                     <tr>
                         <td>{{ $file->file->fileName }}</td>
@@ -31,8 +49,8 @@
                         <td>
                             <div class="d-flex justify-content-center">
                                 <a href="{{ route('file.download', $file->file->id) }}" download
-                                    class="btn btn-sm btn-primary">
-                                    <i class="fas fa-download"></i>
+                                    class="btn btn-sm btn-success">
+                                    <i class="fas fa-download"></i> Download
                                 </a>
                             </div>
                         </td>

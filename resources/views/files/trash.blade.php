@@ -22,7 +22,7 @@
                         aria-describedby="button-addon2" name="search" id="search">
                 </div>
             </div>
-            <div class="row mt-2 px-3 justify-content-center" id="gridView">
+            <div class="row mt-2 px-3 justify-content-start" id="gridView">
                 @include('files.partials.trash_gridview')
             </div>
             @else
@@ -37,7 +37,13 @@
 <script>
     $(document).ready( function () {
         $('#fileIndexTable').DataTable({
-            order: [[2, 'desc']],
+            columnDefs: [
+                {
+                    targets: [4],
+                    orderable: false,
+                },
+            ],
+            order: [[4, 'asc'], [2, 'desc']],
             info: false,
         });
     });

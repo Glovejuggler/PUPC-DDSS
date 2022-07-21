@@ -5,14 +5,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_token" content="{{ csrf_token() }}">
+
     <title>{{ config('app.name') }}</title>
 
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/datatables.css') }}">
     @yield('css')
+    <style>
+        .hide-on-load {
+            visibility: hidden;
+        }
+    </style>
 
-    <meta name="_token" content="{{ csrf_token() }}">
-
+    <script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default.min.css">
     @yield('preload')
 </head>
 
@@ -33,7 +40,7 @@
             </ul>
 
             <ul class="navbar-nav ml-auto">
-                <img src="{{ MyAvatar::getAvatar(Auth::user()->id, 50) }}" alt="" class="rounded-circle my-auto"
+                <img src="{{ DDSS::getAvatar(Auth::user()->id, 50) }}" alt="" class="rounded-circle my-auto"
                     style="width: 15%; height: 15%">
                 <li class="nav-item dropdown">
                     <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
@@ -107,7 +114,7 @@
                         </li>
                         @endcan
                         <li
-                            class="nav-item {{ Request::is('files*', 'shared_files', 'trash') ? 'menu-open' : 'menu-close' }}">
+                            class="nav-item {{ Request::is('files*', 'shared_files', 'trash', 'share*') ? 'menu-open' : 'menu-close' }}">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-folder-tree"></i>
                                 <p>
@@ -125,7 +132,7 @@
                                 </li>
                                 @can('do-admin-stuff')
                                 <li class="nav-item">
-                                    <a href="{{ route('file.trash') }}"
+                                    <a href="{{ Cookie::get('tview') == 'grid' ? route('file.trash').'?grid=1' : route('file.trash') }}"
                                         class="nav-link {{ Request::is('trash') ? 'active' : '' }}">
                                         <i class="fas fa-trash nav-icon"></i>
                                         <p>Trash</p>
@@ -135,7 +142,7 @@
                                 @cannot('do-admin-stuff')
                                 <li class="nav-item">
                                     <a href="{{ route('share.index') }}"
-                                        class="nav-link {{ Request::is('shared_files') ? 'active' : '' }}">
+                                        class="nav-link {{ Request::is('shared_files', 'share*') ? 'active' : '' }}">
                                         <i class="fas fa-square-share-nodes nav-icon"></i>
                                         <p>Shared Files</p>
                                     </a>
@@ -143,13 +150,23 @@
                                 @endcannot
                             </ul>
                         </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('activity.log') }}"
+                                class="nav-link {{ Request::is('activities') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-clock"></i>
+                                <p>
+                                    Activity log
+                                </p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
         </aside>
 
         {{-- Content --}}
-        <div class="content-wrapper pt-2">
+        <div class="content-wrapper pt-2 hide-on-load" id="contentWrapper">
 
             @yield('content')
 
@@ -170,6 +187,7 @@
     <script>
         $(document).ready( function () {
             $('#myTable').DataTable();
+            $('#contentWrapper').removeClass('hide-on-load');
         });
     </script>
 

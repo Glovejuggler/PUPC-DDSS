@@ -1,14 +1,29 @@
-<table class="table table-bordered hover compact" id="fileIndexTable">
+<table class="hover compact" id="fileIndexTable">
     <thead>
         <tr>
             <th>Name</th>
             <th>Uploader</th>
             <th>Date deleted</th>
             <th>Date uploaded</th>
-            <th>Actions</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
+        @forelse ($folders as $folder)
+        <tr>
+            <td><i class="fas fa-folder text-yellow"></i> {{ $folder->folderName }}</td>
+            <td>{{ $folder->user->full_name() }}</td>
+            <td>{{ $folder->deleted_at->format('M j, Y \a\t g:i:s A') }}</td>
+            <td>{{ $folder->created_at->format('M j, Y \a\t g:i:s A') }}</td>
+            <td>
+                <div class="d-flex justify-content-center">
+                    <a href="{{ route('folder.recover', $folder->id) }}" class="btn btn-sm btn-success">Restore</a>
+                </div>
+            </td>
+        </tr>
+        @empty
+
+        @endforelse
         @foreach ($files as $file)
         <tr>
             <td>{{ $file->fileName }}</td>

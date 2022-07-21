@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\File;
 use App\Models\Role;
 use App\Models\Share;
+use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
@@ -23,9 +24,14 @@ class ShareController extends Controller
      */
     public function index()
     {
-        $files = Share::where('role_id','=',Auth::user()->role_id)->paginate(10);
+        $files = Share::where('role_id','=',Auth::user()->role_id)
+                        ->whereNotNull('file_id')
+                        ->paginate(10);
+        $folders = Share::where('role_id','=',Auth::user()->role_id)
+                        ->whereNotNull('folder_id')
+                        ->get();
 
-        return view('share.index', compact('files'));
+        return view('share.index', compact('files','folders'));
     }
 
     /**
@@ -70,7 +76,7 @@ class ShareController extends Controller
         }
 
 
-        return redirect()->route('file.index')->with('toast_success', 'Successfully shared file');
+        return redirect()->back()->with('toast_success', 'Successfully shared file');
     }
 
     /**
@@ -81,7 +87,12 @@ class ShareController extends Controller
      */
     public function show($id)
     {
-        //
+        $files = File::where('folder_id','=',$id)->paginate(15);
+        $folder = Folder::find($id);
+
+        $image = $image = ['jpg', 'jpeg', 'png', 'bmp'];
+
+        return view('share.view', compact('files', 'folder', 'image'));
     }
 
     /**

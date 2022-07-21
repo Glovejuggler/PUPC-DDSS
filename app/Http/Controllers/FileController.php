@@ -27,6 +27,12 @@ class FileController extends Controller
      */
     public function index(Request $request, $id = NULL)
     {
+        $current_folder = Folder::find($id);
+        if(Gate::denies('do-admin-stuff')) {
+            if(Gate::denies('open-folder', $current_folder)) {
+                return redirect()->back()->with('toast_error', 'Access denied');
+            }
+        }
         /**
          * Controls the pagination depending
          * if viewed as grid or list
@@ -44,13 +50,13 @@ class FileController extends Controller
         }
         
         $folders = $this->queryFolders()
-                        ->where('parent_folder_id','=',$id);
+                        ->where('parent_folder_id','=',$id)
+                        ->get();
 
         $roles = Role::all();
 
         $shares = Share::all();
         $share_roles = Role::where('id','!=',Auth::user()->role_id)->get();
-        $current_folder = Folder::find($id);
 
         $image = ['jpg', 'jpeg', 'png', 'bmp'];
         
@@ -69,7 +75,8 @@ class FileController extends Controller
                 ->causedBy(Auth::user())
                 ->performedOn($file)
                 ->event('restored')
-                ->log('Restored a file');
+                ->withProperties(['name' => $file->fileName])
+                ->log('restored a file');
 
         return redirect()->back()->with('toast_success', 'File restored');
     }
@@ -131,7 +138,8 @@ class FileController extends Controller
                     ->causedBy(Auth::user())
                     ->performedOn($newFile)
                     ->event('uploaded')
-                    ->log('Uploaded a file');
+                    ->withProperties(['name' => $newFile->fileName])
+                    ->log('uploaded a file');
             }
 
         return redirect()->back()->with('toast_success', 'File(s) uploaded successfully');
@@ -142,14 +150,27 @@ class FileController extends Controller
      */
     public function download($id)
     {
-        $file = File::withTrashed()->find($id);
+        if(Gate::allows('do-admin-stuff')){
+            $file = File::withTrashed()->find($id);
+        } else {
+            $file = File::find($id);
+        }
+
+        if(Gate::denies('do-admin-stuff')){
+            if(Gate::denies('can-download', $file)){
+                return redirect()->back()->with('toast_error', 'Access denied');
+            }
+        }
+
+
         $path = str_replace('\\', '/', storage_path()).'/app/public/'.$file->filePath;
 
         activity()
             ->causedBy(Auth::user())
             ->performedOn($file)
             ->event('downloaded')
-            ->log('Downloaded a file');
+            ->withProperties(['name' => $file->fileName])
+            ->log('downloaded a file');
         
         return response()->download($path);
     }
@@ -173,7 +194,7 @@ class FileController extends Controller
      */
     public function edit(File $file)
     {
-        return view('files.edit', compact('file'));
+        
     }
 
     /**
@@ -190,6 +211,7 @@ class FileController extends Controller
         } else {
             $folderName = $file->folder->folderName.'/';
         }
+        $oldName = $file->fileName;
         $file_path = 'public/'.$folderName.$file->fileName;
         $extension = pathinfo(storage_path($file->filePath), PATHINFO_EXTENSION);
         $target_path = 'public/'.$folderName.$request->fileName.'.'.$extension;
@@ -203,9 +225,10 @@ class FileController extends Controller
             ->causedBy(Auth::user())
             ->performedOn($file)
             ->event('renamed')
-            ->log('Renamed a file');
+            ->withProperties(['old_name' => $oldName, 'new_name' => $file->fileName])
+            ->log('renamed a file');
 
-        return redirect()->route('file.index')->with('toast_success', 'Rename successful');
+        return redirect()->back()->with('toast_success', 'Rename successful');
     }
 
     /**
@@ -224,14 +247,14 @@ class FileController extends Controller
         // if(Storage::disk('public')->exists('files/'.$file->folder->folderName.'/'.$file->fileName)){
         //     Storage::disk('public')->delete('files/'.$file->folder->folderName.'/'.$file->fileName);
         // }
-        $file->delete();
-
         activity()
-                    ->causedBy(Auth::user())
-                    ->performedOn($file)
-                    ->event('deleted')
-                    ->log('Deleted a file');
-        
+            ->causedBy(Auth::user())
+            ->performedOn($file)
+            ->event('deleted')
+            ->withProperties(['name' => $file->fileName])
+            ->log('deleted a file');
+
+        $file->delete();
 
         return redirect()->back()->with('toast_success', 'File deleted successfully');
     }
@@ -261,16 +284,19 @@ class FileController extends Controller
                                 ->where('fileName','LIKE','%'.$request->search.'%')
                                 ->paginate(15);
                 $folders = $this->queryFolders()
-                                ->where('parent_folder_id','=',$request?->folder);
+                                ->where('folderName','LIKE','%'.$request->search.'%')
+                                ->where('parent_folder_id','=',$request?->folder)
+                                ->get();
             } else {
                 $files = $this->queryFiles()
                                 ->where('folder_id','=',$request?->folder)
                                 ->paginate(15);
                 $folders = $this->queryFolders()
-                                ->where('parent_folder_id','=',$request?->folder);
+                                ->where('parent_folder_id','=',$request?->folder)
+                                ->get();
             }
 
-            if($files->count() > 0) {
+            if($files->count() > 0 || $folders->count() > 0) {
                 return view('files.partials.gridview',
                         compact('files', 'folders', 'roles', 'share_roles', 'shares', 'image'))
                         ->render();
@@ -309,7 +335,7 @@ class FileController extends Controller
     public function queryFolders()
     {
         if(Gate::allows('do-admin-stuff')){
-            $folders = Folder::all();
+            $folders = Folder::orderBy('created_at', 'desc');
         } else {
             $folders = Folder::wherehas('user', function(Builder $query){
                 $query->where('role_id','=',Auth::user()->role_id);
@@ -325,12 +351,14 @@ class FileController extends Controller
     public function trash_index()
     {
         if(request('grid') == 1) {
+            Cookie::queue('tview', 'grid', 2628000);
             $files = $this->queryFiles()->onlyTrashed()->paginate(15);
         } else {
+            Cookie::queue('tview', 'list', 2628000);
             $files = $this->queryFiles()->onlyTrashed()->get();
         }
         
-        $folders = $this->queryFolders();
+        $folders = $this->queryFolders()->onlyTrashed()->get();
 
         $image = ['jpg', 'jpeg', 'png', 'bmp'];
 
@@ -353,10 +381,13 @@ class FileController extends Controller
                                 ->onlyTrashed()
                                 ->where('fileName','LIKE','%'.$request->search.'%')
                                 ->paginate(15);
-                $folders = $this->queryFolders();
+                $folders = $this->queryFolders()
+                                ->onlyTrashed()
+                                ->where('folderName','LIKE','%'.$request->search.'%')
+                                ->get();
             } else {
                 $files = $this->queryFiles()->onlyTrashed()->paginate(15);
-                $folders = $this->queryFolders();
+                $folders = $this->queryFolders()->onlyTrashed()->get();
             }
 
             if($files->count() > 0) {

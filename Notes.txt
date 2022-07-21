@@ -5,6 +5,10 @@ If thumbnail doesn't show but works (can be seen when the image is status 500 in
 If it still doesn't work and the status in the console is 404
 1. Add the port to the APP_URL in the .env (basically add :8000 at the end)
 
+php artisan filepond:clear to clear filepond's temp files
+
+php artisan thumbnail:purge to clear all the thumbnails
+
 
 Custom CSS
 /* Scrollbar */

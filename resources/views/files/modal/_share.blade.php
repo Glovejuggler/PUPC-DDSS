@@ -15,11 +15,12 @@
                     @if ($role->id != Auth::user()->role_id)
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="{{ $role->id }}" name="role_id[]"
-                            id="checkbox{{ $file->id.'-'.$role->id }}" @foreach ($shares as $share) {{ $share->role_id
+                            id="filecheckbox{{ $file->id.'-'.$role->id }}" @foreach ($shares as $share) {{
+                            $share->role_id
                         ==
                         $role->id && $share->file_id == $file->id ? 'checked' : '' }}
                         @endforeach>
-                        <label class="form-check-label" for="checkbox{{ $file->id.'-'.$role->id }}">
+                        <label class="form-check-label" for="filecheckbox{{ $file->id.'-'.$role->id }}">
                             {{ $role->roleName }}
                         </label>
                     </div>

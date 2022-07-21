@@ -15,7 +15,8 @@ class CreateSharesTable extends Migration
     {
         Schema::create('shares', function (Blueprint $table) {
             $table->id();
-            $table->integer('file_id');
+            $table->integer('file_id')->nullable();
+            $table->integer('folder_id')->nullable();
             $table->integer('role_id');
             $table->integer('shared_by');
             $table->timestamp('shared_at');

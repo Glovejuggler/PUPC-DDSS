@@ -233,8 +233,8 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         // SweetAlert
         'Alert' => RealRashid\SweetAlert\Facades\Alert::class,
-        // Custom AvatarHelper
-        'MyAvatar' => App\Helpers\AvatarHelper::class,
+        // Custom Helpers
+        'DDSS' => App\Helpers\DDSS::class,
 
     ],
 
