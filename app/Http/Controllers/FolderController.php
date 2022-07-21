@@ -57,6 +57,7 @@ class FolderController extends Controller
             ->causedBy(Auth::user())
             ->performedOn($folder)
             ->event('restored')
+            ->withProperties(['name' => $folder->folderName])
             ->log('restored a folder');
 
         return redirect()->back()->with('toast_success', 'Folder restored');

@@ -31,7 +31,7 @@
         <div class="card-body">
             <div class="row d-flex justify-content-center">
                 <div class="d-flex justify-content-center avatar-container">
-                    <img src="{{ MyAvatar::getAvatar($user->id, 250) }}" alt="" class="avatar-img">
+                    <img src="{{ DDSS::getAvatar($user->id, 250) }}" alt="" class="avatar-img">
                 </div>
                 <div class="ml-lg-4 col-lg-6">
                     <label for="first_name" class="form-label">First name</label>
