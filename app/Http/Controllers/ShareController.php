@@ -85,14 +85,24 @@ class ShareController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         $files = File::where('folder_id','=',$id)->paginate(15);
         $folder = Folder::find($id);
 
-        $image = $image = ['jpg', 'jpeg', 'png', 'bmp'];
+        if($request->ajax()){
+            $files = File::where('folder_id','=',$request->id)
+                            ->where('fileName','LIKE','%'.$request->search.'%')
+                            ->paginate(15);
 
-        return view('share.view', compact('files', 'folder', 'image'));
+            if($files->count() > 0){
+                return view('share.partials.gridview', compact('files', 'folder'));
+            } else {
+                return 'File not found';
+            }
+        }
+
+        return view('share.view', compact('files', 'folder'));
     }
 
     /**

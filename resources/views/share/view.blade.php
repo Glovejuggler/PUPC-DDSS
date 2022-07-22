@@ -90,6 +90,23 @@
             ],
             info: false,
         });
+
+        $('#search').on('keyup', function(){
+            event.preventDefault();
+            var search = $('#search').val();
+            var id = '{{ $folder->id }}';
+            $.ajax({
+                type: 'get',
+                url: '/share/view/'+id,
+                data: {
+                    'search':search,
+                    'id':id,
+                },
+                success: function(data) {
+                    $('#gridView').html(data);
+                },
+            });
+        });
     });
 </script>
 @endsection

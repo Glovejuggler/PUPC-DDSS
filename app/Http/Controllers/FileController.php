@@ -33,6 +33,7 @@ class FileController extends Controller
                 return redirect()->back()->with('toast_error', 'Access denied');
             }
         }
+        
         /**
          * Controls the pagination depending
          * if viewed as grid or list

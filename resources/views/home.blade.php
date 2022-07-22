@@ -1,5 +1,14 @@
 @extends('layouts.master')
 
+@section('css')
+<style>
+    #contentWrapper {
+        background-image: url('{{ asset('images/PUP-bg-transparent.png') }}');
+        background-size: cover;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="row mt-2">
