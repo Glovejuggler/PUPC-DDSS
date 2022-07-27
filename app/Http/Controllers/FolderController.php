@@ -88,6 +88,8 @@ class FolderController extends Controller
         $folder->parent_folder_id = $request->parent_folder_id;
         if(!Storage::exists($request->folderName)){
             Storage::disk('public')->makeDirectory($request->folderName);
+        } else {
+            return redirect()->back()->with('toast_error', 'Folder already exists');
         }
 
         $folder->save();

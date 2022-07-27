@@ -157,12 +157,11 @@ class FileController extends Controller
             $file = File::find($id);
         }
 
-        if(Gate::denies('do-admin-stuff')){
-            if(Gate::denies('can-download', $file)){
-                return redirect()->back()->with('toast_error', 'Access denied');
-            }
-        }
-
+        // if(Gate::denies('do-admin-stuff')){
+        //     if(Gate::denies('can-download', $file)){
+        //         return redirect()->back()->with('toast_error', 'Access denied');
+        //     }
+        // }
 
         $path = str_replace('\\', '/', storage_path()).'/app/public/'.$file->filePath;
 
