@@ -66,6 +66,9 @@ class DDSS
         return $desc;
     }
 
+    /**
+     * Returns thumbnail
+     */
     public static function file_thumb(File $file)
     {
         $image = ['png', 'jpg', 'jpeg', 'bmp'];
@@ -79,5 +82,35 @@ class DDSS
         } else {
             return Thumbnail::src($default)->crop(200,200)->url();
         }
+    }
+
+    /**
+     * Getting root folder
+     * 
+     * Will use this when needed lmao
+     */
+    public static function getRootFolder(Folder $folder)
+    {
+        $parent_folders = [];
+
+        while (1) {
+            if ($folder->parent_folder_id) {
+                $folder = Folder::find($folder->parent_folder_id);
+                $parent_folders[] = $folder;
+            } else {
+                break;
+            }
+        }
+
+        $return = array_reverse($parent_folders);
+
+        // dd(array_reverse($parent_folders));
+        // $bread = '';
+
+        // foreach ($return as $parent) {
+        //     $bread .= $parent->folderName; 
+        // }
+
+        // return $bread;
     }
 }
